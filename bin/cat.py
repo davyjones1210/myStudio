@@ -1,5 +1,6 @@
 import os
 import optparse
+import sys
 
 
 def executeCode():
@@ -10,17 +11,22 @@ def executeCode():
     )
 
 
-    parser.add_option("-o", "--opens", dest="open", action = "store", help="Sets which dcc to open", default="blender4.3")
+    parser.add_option("-o", "--opens", dest="dcc_open", action = "store", help="Sets which dcc to open", default="tester4.3")
+    parser.add_option("-a", "--artist", dest="artist", action = "store", help="Sets name of artist", default="John Doe")
+    parser.add_option("-p", "--project", dest="project", action = "store", help="Sets name of project", default="Project X")
+    parser.add_option("-s", "--show", dest="show", action = "store", help="Sets name of show", default="Show ABC")
     
     options, args = parser.parse_args()
 
     print("Print options: ", options)
-    print("Printing option.open here: ", options.open)
+    print("Printing option.dcc_open here: ", options.dcc_open)
+    print("Raw sys.argv:", sys.argv)
+
     
 
-    if options.open:        
+    if options.dcc_open:        
         print("Opening DCCs")
-        dcc_path = "%SOFTWARE_PATH%" + "/" + options.open + ".bat"      
+        dcc_path = "%SOFTWARE_PATH%" + "/" + options.dcc_open + ".bat"      
         print("Printing DCC PATH: ", dcc_path)
         os.system(dcc_path)
         
@@ -34,6 +40,6 @@ if __name__ == "__main__":
     executeCode()
 
 
-# Debug options.open
+# Debug options.open - done
 # Create artist, create project, open show
 

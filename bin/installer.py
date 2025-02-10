@@ -5,18 +5,16 @@ import os
 from optparse import OptionParser
 
 
-def setup_studio_env(studio_name, nuke_version, maya_version, artist_name):
+def setup_studio_env(studio_name, environments):
     # Creating a separate function to set and print environment variables
     os.environ["STUDIO_NAME"] = studio_name
-    os.environ["NUKE_VERSION"] = nuke_version
-    os.environ["MAYA_VERSION"] = maya_version
-    os.environ["ARTIST_NAME"] = artist_name
+    os.environ["ENV_FLAG"] = str(environments)
+
     
     print("Studio Environment Variables Set:")
     print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
-    print(f"NUKE_VERSION: {os.environ['NUKE_VERSION']}")
-    print(f"MAYA_VERSION: {os.environ['MAYA_VERSION']}")
-    print(f"ARTIST_NAME: {os.environ['ARTIST_NAME']}")
+    print(f"ENV_FLAG: {os.environ['ENV_FLAG']}")
+
 
 
 
@@ -27,9 +25,6 @@ if __name__ == "__main__":
 
     # Using add_option to define various command line flags 
     parser.add_option("-s", "--studio", dest="studio_name", help="Set the studio name", default="KD_Studio")
-    parser.add_option("-n", "--nuke", dest="nuke_version", help="Set the Nuke version", default="14.0v5")
-    parser.add_option("-m", "--maya", dest="maya_version", help="Set the Maya version", default="2023")
-    parser.add_option("-a", "--artist", dest="artist_name", help="Set the artist name", default="John Doe")
     parser.add_option("-e", "--environment", action = "store_true", dest = "environments", default = False, help = "Set up the pipeline command and primary environments")
 
 
@@ -38,7 +33,7 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     # Calls the above defined function and passes the various recognized options as arguments
-    setup_studio_env(options.studio_name, options.nuke_version, options.maya_version, options.artist_name)
+    setup_studio_env(options.studio_name, options.environments)
 
     if options.environments:
         # set PATH env   
