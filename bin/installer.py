@@ -54,8 +54,11 @@ if __name__ == "__main__":
         os.environ["PYTHONPATH"] = pylib_path_name + ";" + mystudio_path
         # print(os.environ["PYTHONPATH"])
 
-        # set bin path
-        
+        # set config path
+        config_path_name = "E:/pipelineDevelopment/config"        
+        os.environ["CONFIG_PATH"] = config_path_name
+        print(os.environ["CONFIG_PATH"])
+                
         os.system("cmd")
     else:
         print("by passed, try with -e or --environment")

@@ -1,0 +1,24 @@
+import os
+import json
+
+def triggerOpen(name):
+    filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
+    data = readJoson(filepath)
+
+# From this data variable, figure out the specific block from the list, if blender collect blender data, if maya, collect maya
+# From the config find out what DCC was typed in cat --opens "here"
+
+
+
+def readJoson(filepath):
+    with open(filepath, 'r') as openfile:
+        return json.load(openfile)
+
+
+# os.environ["BLENDER_PLUG_IN_PATH"] = "E:/pipelineDevelopment/test1;E:/pipelineDevelopment/test2",        
+# os.environ["BLENDER_SCRIPT_PATH"] = "E:/pipelineDevelopment/test3;E:/pipelineDevelopment/test4",  
+# 
+# and then launch blender using the path key in json file. And also create a new block for Nuke.
+# 
+# One more task: Go to cat.py, create a artist by creating a database folder and treat json like a database (table, rows & column). Store artist info like # name, id, email, etc. If an artist database file doesn't exist create it and then edit it going forward.
+# In installer.py add another env variable called DATABASE_PATH
