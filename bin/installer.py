@@ -58,6 +58,11 @@ if __name__ == "__main__":
         config_path_name = "E:/pipelineDevelopment/config"        
         os.environ["CONFIG_PATH"] = config_path_name
         print(os.environ["CONFIG_PATH"])
+
+        # set database path
+        db_path_name = "E:/pipelineDevelopment/database"        
+        os.environ["DATABASE_PATH"] = db_path_name
+        print("Database path: ", os.environ["DATABASE_PATH"])
                 
         os.system("cmd")
     else:

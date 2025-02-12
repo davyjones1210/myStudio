@@ -4,6 +4,11 @@ import json
 def triggerOpen(name):
     filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
     data = readJoson(filepath)
+    # print("Data variable: ", data)
+    print("Options.open value passed: ", name)
+    collectDCC(name, data)
+
+
 
 # From this data variable, figure out the specific block from the list, if blender collect blender data, if maya, collect maya
 # From the config find out what DCC was typed in cat --opens "here"
@@ -13,7 +18,26 @@ def triggerOpen(name):
 def readJoson(filepath):
     with open(filepath, 'r') as openfile:
         return json.load(openfile)
+    
 
+def collectDCC(name, data):
+    # Extract and print 'envs' values
+    for software in data:
+        print("Printing software: ", software['name'])
+        if name == software['name']:                    
+            print(f"Software: {software['name']}")
+            dcc_path = software['path']
+            for env in software["envs"]:
+                env_name = env["env"]
+                env_paths = ";".join(env["path"])  # Join paths with ';'
+                os.environ[env_name] = env_paths   # Set environment variable
+                print(f'Set os.environ["{env_name}"] = {os.environ[env_name]}')  # Debug output
+                print("Printing os environment values: ", os.environ[env_name])
+            print("DCC path: ", dcc_path)
+            os.system(dcc_path)
+        else:
+            print("DCC name not matching")
+            
 
 # os.environ["BLENDER_PLUG_IN_PATH"] = "E:/pipelineDevelopment/test1;E:/pipelineDevelopment/test2",        
 # os.environ["BLENDER_SCRIPT_PATH"] = "E:/pipelineDevelopment/test3;E:/pipelineDevelopment/test4",  
