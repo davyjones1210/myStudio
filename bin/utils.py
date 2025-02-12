@@ -22,18 +22,13 @@ def readJoson(filepath):
 
 def collectDCC(name, data):
     # Extract and print 'envs' values
-    for software in data:
-        print("Printing software: ", software['name'])
-        if name == software['name']:                    
-            print(f"Software: {software['name']}")
+    for software in data:        
+        if name == software['name']:            
             dcc_path = software['path']
             for env in software["envs"]:
                 env_name = env["env"]
                 env_paths = ";".join(env["path"])  # Join paths with ';'
-                os.environ[env_name] = env_paths   # Set environment variable
-                print(f'Set os.environ["{env_name}"] = {os.environ[env_name]}')  # Debug output
-                print("Printing os environment values: ", os.environ[env_name])
-            print("DCC path: ", dcc_path)
+                os.environ[env_name] = env_paths   # Set environment variable        
             os.system(dcc_path)
         else:
             print("DCC name not matching")
@@ -46,3 +41,5 @@ def collectDCC(name, data):
 # 
 # One more task: Go to cat.py, create a artist by creating a database folder and treat json like a database (table, rows & column). Store artist info like # name, id, email, etc. If an artist database file doesn't exist create it and then edit it going forward.
 # In installer.py add another env variable called DATABASE_PATH
+
+# Next, create an argument for creating artist then name, id, email id.

@@ -13,9 +13,6 @@ def setup_studio_env(studio_name, environments):
     
     print("Studio Environment Variables Set:")
     print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
-    print(f"ENV_FLAG: {os.environ['ENV_FLAG']}")
-
-
 
 
 # Entry-point to the program. Code execution starts from here
@@ -36,8 +33,7 @@ if __name__ == "__main__":
     setup_studio_env(options.studio_name, options.environments)
 
     if options.environments:
-        # set PATH env   
-        print("Printing OS ENVIRON PATH")
+        # set PATH env           
         path_name = "E:/pipelineDevelopment/sourcecodes/myStudio/bin"
         os.environ["PATH"] = os.environ["PATH"] + ";" + path_name
         os.environ["MY_BIN"] = path_name
@@ -57,12 +53,17 @@ if __name__ == "__main__":
         # set config path
         config_path_name = "E:/pipelineDevelopment/config"        
         os.environ["CONFIG_PATH"] = config_path_name
-        print(os.environ["CONFIG_PATH"])
+        # print(os.environ["CONFIG_PATH"])
 
         # set database path
         db_path_name = "E:/pipelineDevelopment/database"        
         os.environ["DATABASE_PATH"] = db_path_name
         print("Database path: ", os.environ["DATABASE_PATH"])
+
+        # set project path
+        project_path_name = "E:/pipelineDevelopment/project"        
+        os.environ["PROJECT_PATH"] = db_path_name
+        print("Project path: ", os.environ["PROJECT_PATH"])
                 
         os.system("cmd")
     else:
