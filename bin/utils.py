@@ -26,17 +26,20 @@ def readJoson(filepath):
     
 
 def collectDCC(name, data):
+    found = False  # Flag to track if DCC name is found
     # Extract and print 'envs' values
     for software in data:        
-        if name == software['name']:            
+        if name == software['name']: 
+            found = True  # Set flag to True if a match is found           
             dcc_path = software['path']
             for env in software["envs"]:
                 env_name = env["env"]
                 env_paths = ";".join(env["path"])  # Join paths with ';'
                 os.environ[env_name] = env_paths   # Set environment variable        
             os.system(dcc_path)
-        else:
-            print("DCC name not matching")
+            break  # Exit loop after the first match
+    if not found:  # If no match was found after looping
+        print("DCC name not matching")
             
 
 # os.environ["BLENDER_PLUG_IN_PATH"] = "E:/pipelineDevelopment/test1;E:/pipelineDevelopment/test2",        

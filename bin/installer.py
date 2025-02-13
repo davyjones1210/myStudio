@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
         # set project path
         project_path_name = "E:/pipelineDevelopment/project"        
-        os.environ["PROJECT_PATH"] = db_path_name
+        os.environ["PROJECT_PATH"] = project_path_name
         print("Project path: ", os.environ["PROJECT_PATH"])
                 
         os.system("cmd")
