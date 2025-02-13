@@ -5,6 +5,15 @@ DOMAIN_CAT = ["asset", "shot"]
 
 ASSET_CAT = [["asset", ["modeling", "rigging"]], ["shot", ["layout", "animation"]]]
 
+# Define the JSON file for domain db
+domains_json_file = os.path.expandvars("%DATABASE_PATH%/domain.json")
+
+
+# Initialize the JSON database if it doesn't exist
+if not os.path.exists(domains_json_file):
+    with open(domains_json_file, "w") as file:
+        json.dump([], file, indent=4)  # Empty list to store artist data
+
 
 def triggerOpen(name):
     filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
@@ -13,7 +22,41 @@ def triggerOpen(name):
     print("Options.open value passed: ", name)
     collectDCC(name, data)
 
+def createDomain(domain_name, domain_cat, start_id=301):
+    
+    # Load existing domain database
+    with open(domains_json_file, "r") as file:
+        domains = json.load(file)
 
+    # Check if the domain already exists
+    for domain in domains:
+        if domain["name"].lower() == domain_name.lower():  # Case-insensitive match
+            print(f"\nDomain '{domain_name}' already exists with category {domain['category']}")
+            return domain  # Return existing project entry
+        
+    
+    # Assign new domain ID (increment from highest existing ID)
+    if domains:
+        max_id = max(domain["id"] for domain in domains)
+    else:
+        max_id = start_id - 1  # Start from 201 if empty
+
+    new_id = max_id + 1
+
+    # Create new domain record
+    new_domain = {
+        "id": new_id,
+        "name": domain_name,
+        "category": domain_cat
+    }
+    domains.append(new_domain)
+
+    # Save updated domain database
+    with open(domains_json_file, "w") as file:
+        json.dump(domains, file, indent=4)
+
+    print(f"\nAdded new domain: {new_domain}")
+    return new_domain
 
 # From this data variable, figure out the specific block from the list, if blender collect blender data, if maya, collect maya
 # From the config find out what DCC was typed in cat --opens "here"

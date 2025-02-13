@@ -39,7 +39,8 @@ def executeCode():
     parser.add_option("-o", "--opens", dest="open", action = "store", help="Sets which dcc to open", default=None)
     parser.add_option("--create-artist", dest="create_artist", action = "store", help="Create name of artist", default=None)
     parser.add_option("--create-project", dest="create_project", action = "store", help="Create name of project", default=None)
-    parser.add_option("--create-domain", dest="create_domain", action = "store", help="Create name of domain", default=None)  
+    parser.add_option("--create-domain", dest="create_domain", action = "store", help="Create domain", default=None)  
+    parser.add_option("--domain-cat", dest="domain_cat", action = "store", help="Create domain category", default=None) 
     # parser.add_option("--login", dest="login", action = "store", help="Sets login info of artist", default=None)  
        
     parser.add_option("--domain-cata", dest="domain_cata", action = "store", help="Sets name of artist", default=None)    
@@ -128,16 +129,10 @@ def executeCode():
         """
 
         # os.environ["USER_EMAIL"] = "johndoe@example.com"
-        # Update such that the user info is stored as environment variables. 
-
-        
+        # Update such that the user info is stored as environment variables.         
 
         returned_artist_info = name_to_database(options.create_artist)   
 
-        # Create environment varibles which will store this user info
-        # os.environ["ARTIST_ID"] = str(returned_artist_info["id"])
-        # os.environ["ARTIST_NAME"] = returned_artist_info["name"]
-        # os.environ["ARTIST_EMAIL"] = returned_artist_info["email"]
 
         logging.info(f"\nArtist info in database\nName: {returned_artist_info["name"]}, ID: {str(returned_artist_info["id"])}, email: {returned_artist_info["email"]}\n")
 
@@ -151,10 +146,6 @@ def executeCode():
 
         returned_project_info = save_project(options.create_project)   
 
-        # Create environment varibles which will store this user info
-        # os.environ["PROJECT_ID"] = str(returned_project_info["id"])
-        # os.environ["PROJECT_NAME"] = returned_project_info["name"]
-
         logging.info(f"\nProject info in database\nName:: {returned_project_info["name"]}, PROJECT ID: {str(returned_project_info["id"])}")
         
         
@@ -166,14 +157,10 @@ def executeCode():
         # cat --create-domain "shot1" --domain-cat <"shot">
         """
 
-        utils.createDomain(options.create_domain, type=options.domain_type, cat=options.domain_cata)
+        utils.createDomain(options.create_domain, options.domain_cat)
         # cata --create-domain ball --domain_cata asset
         pass
-
-
-
-
-    
+ 
 
 def save_project(project_name, start_id=201):
     # Load existing project database
