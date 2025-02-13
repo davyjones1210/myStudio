@@ -28,13 +28,63 @@ def executeCode():
     )
 
     parser.add_option("-o", "--opens", dest="open", action = "store", help="Sets which dcc to open", default=None)
+
+    parser.add_option("--create-artist", dest="create_artist", action = "store", help="Sets name of artist", default=None)
+    parser.add_option("--create-project", dest="create_project", action = "store", help="Sets name of artist", default=None)
+    parser.add_option("--create-domain", dest="create_domain", action = "store", help="Sets name of artist", default=None)  
+    parser.add_option("--login", dest="login", action = "store", help="Sets login info of artist", default=None)  
+
+       
+    parser.add_option("--domain-cata", dest="domain_cata", action = "store", help="Sets name of artist", default=None)    
+
     parser.add_option("-a", "--artist", dest="artist", action = "store", help="Sets name of artist", default="John Doe")
     parser.add_option("-p", "--project", dest="project", action = "store", help="Sets name of project", default="Test_project")
     parser.add_option("-s", "--show", dest="show", action = "store", help="Sets name of show", default="Test_show")
     parser.add_option("-d", "--domain", dest="domain", action = "store", help="Sets domain name", default="Test_domain")
+
+
     
     options, args = parser.parse_args()
-    print("Print options: ", options)    
+    print("Print options: ", options)
+
+
+    if options.open:
+        """
+        Exapmples
+        # cat --open maya2025 --project proj1
+        # cat --open maya2025 --project proj1 --artist "Artist_name"
+        # cat --open maya2025
+        """
+
+        pass
+
+    if options.create_artist:
+        """
+        Exapmples
+        # cat --create-artist "Artist Name"
+        """
+        pass
+
+
+    if options.create_project:
+        """
+        Exapmples
+        # cat --create-project "Project Name"
+        """
+        pass
+
+    if options.create_domain:
+        """
+        Exapmples
+        # cat --create-domain "bat" --domain-cat <"asset">
+        # cat --create-domain "shot1" --domain-cat <"shot">
+        """
+
+        utils.crerateDomain(options.create_domain, type=options.domain_type, cat=options.domain_cata)
+        # cata --create-domain ball --domain_cata asset
+        pass
+
+
 
     # Setup an environment variable for project
     os.environ["PROJECT_NAME"] = options.project
@@ -53,8 +103,16 @@ def executeCode():
     logging.info(f"\nArtist env set to: {os.environ["ARTIST_NAME"]}, email: {os.environ["ARTIST_EMAIL"]}")
 
     if options.open:
+        """
+        Exapmples
+        # cat --open maya2025 --project proj1
+        # cat --open maya2025 --project proj1 --artist "Artist_name"
+        # cat --open maya2025
+        """
+
+       
         print("Triggering opening function now\n")
-        utils.triggerOpen(options.open)
+        utils.triggerOpen(options.open, project=options.project)
         
         # print("Opening DCCs")
         # dcc_path = "%SOFTWARE_PATH%" + "/" + options.open + ".bat"      

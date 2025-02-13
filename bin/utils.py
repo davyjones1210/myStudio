@@ -1,6 +1,11 @@
 import os
 import json
 
+DOMAIN_CAT = ["asset", "shot"]
+
+ASSET_CAT = [["asset", ["modeling", "rigging"]], ["shot", ["layout", "animation"]]]
+
+
 def triggerOpen(name):
     filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
     data = readJoson(filepath)
