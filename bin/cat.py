@@ -32,16 +32,16 @@ class CatCommand():
             with open(self.projects_json_file, "w") as file:
                 json.dump([], file, indent=4)  # Empty list to store artist data
 
-
+        
 
 
     def executeCode(self):
-            
+        #Initialize optparser to parse command line prompt
         parser = optparse.OptionParser(
         usage="usage: %prog\n\tInstaller to set up my studio pipeline",
         version="0.0.1",
         )
-
+        # Parsing command line arguments using add_option method of optparse
         parser.add_option("-o", "--opens", dest="open", action = "store", help="Sets which dcc to open", default=None)
         parser.add_option("--create-artist", dest="create_artist", action = "store", help="Create name of artist", default=None)
         parser.add_option("--create-project", dest="create_project", action = "store", help="Create name of project", default=None)
@@ -60,6 +60,9 @@ class CatCommand():
         
         options, args = parser.parse_args()
         print("Print options:\n", options)
+
+        # Initialize utils_command
+        utils_command = utils.UtilsCommand(self.artists_json_file, self.projects_json_file)
 
         # Executing code after command line arguments are parsed
         if options.open:        
@@ -121,8 +124,8 @@ class CatCommand():
             # Now the program triggers opening of project after project & artist env is set            
 
             if artist_found and project_found:      # Trigger open only if artist name & project name match in db          
-                print("Triggering opening function now\n")
-                utils.triggerOpen(options.open) #, project=options.project, artist=options.artist)
+                print("Triggering opening function now\n")                
+                utils_command.triggerOpen(options.open) #, project=options.project, artist=options.artist)
             
             # print("Opening DCCs")
             # dcc_path = "%SOFTWARE_PATH%" + "/" + options.open + ".bat"      
@@ -139,9 +142,8 @@ class CatCommand():
 
             # os.environ["USER_EMAIL"] = "johndoe@example.com"
             # Update such that the user info is stored as environment variables.         
-
-            returned_artist_info = self.name_to_database(options.create_artist)   
-
+            #utils_command = utils.UtilsCommand(self.artists_json_file, self.projects_json_file)
+            returned_artist_info = utils_command.name_to_database(options.create_artist)   
 
             logging.info(f"\nArtist info in database\nName: {returned_artist_info["name"]}, ID: {str(returned_artist_info["id"])}, email: {returned_artist_info["email"]}\n")
 
@@ -155,8 +157,8 @@ class CatCommand():
 
             # Think about revising code regularly. Code is not final, always. Feel free to refactor constantly. 
             # Refactor: enhance your code.        
-
-            returned_project_info = self.save_project(options.create_project)   
+            
+            returned_project_info = utils_command.save_project(options.create_project)   
 
             logging.info(f"\nProject info in database\nName:: {returned_project_info["name"]}, PROJECT ID: {str(returned_project_info["id"])}")
             
@@ -169,94 +171,9 @@ class CatCommand():
             # cat --create-domain "shot1" --domain-cat <"shot"> --project_id <project id>
             """
 
-            utils.createDomain(options.create_domain, options.domain_cat)
-            # cata --create-domain ball --domain_cata asset
-            pass
+            utils_command.createDomain(options.create_domain, options.domain_cat)
+            # cata --create-domain "ball" --domain_cata "asset"
     
-
-    def save_project(self, project_name, start_id=201):
-        # Load existing project database
-        with open(self.projects_json_file, "r") as file:
-            projects = json.load(file)
-
-        # Check if the project already exists
-        for project in projects:
-            if project["name"].lower() == project_name.lower():  # Case-insensitive match
-                print(f"\nProject '{project_name}' already exists with ID {project['id']}")
-                return project  # Return existing project entry
-
-        # Assign new ID (increment from highest existing ID)
-        if projects:
-            max_id = max(project["id"] for project in projects)
-        else:
-            max_id = start_id - 1  # Start from 201 if empty
-
-        new_id = max_id + 1
-
-        # Create new project record
-        new_project = {
-            "id": new_id,
-            "name": project_name
-        }
-        projects.append(new_project)
-
-        # Save updated project database
-        with open(self.projects_json_file, "w") as file:
-            json.dump(projects, file, indent=4)
-
-        print(f"\nAdded new project: {new_project}")
-        return new_project
-
-
-
-    def name_to_database(self, full_name, domain="example.com", start_id=101):
-        # Load existing artist database
-        with open(self.artists_json_file, "r") as file:
-            data = json.load(file)
-
-        # Remove quotes and split the name into parts
-        name_parts = full_name.replace('"', '').split()
-
-        # Ensure at least first and last name are present
-        if len(name_parts) < 2:
-            raise ValueError("Invalid name format. Must have at least a first and last name.")
-
-        # Extract first name, middle initial (if present), and last name
-        first_name = name_parts[0].lower()
-        middle_initial = name_parts[1].lower() if len(name_parts) == 3 else ""
-        last_name = name_parts[-1].lower()
-
-        # Generate the email address
-        email = f"{first_name}{middle_initial}{last_name}@{domain}" if middle_initial else f"{first_name}{last_name}@{domain}"
-
-        # Check if email already exists in database
-        for artist in data:
-            if artist["email"] == email:
-                print(f"Email {email} already exists with ID {artist['id']}")
-                return artist  # Return existing artist entry
-
-        # Assign new ID (increment from highest existing ID)
-        if data:
-            max_id = max(artist["id"] for artist in data)
-        else:
-            max_id = start_id - 1  # Start from 101 if empty
-
-        new_id = max_id + 1
-
-        # Create new artist record
-        new_artist = {
-            "id": new_id,
-            "name": full_name,
-            "email": email
-        }
-        data.append(new_artist)
-
-        # Save updated database
-        with open(self.artists_json_file, "w") as file:
-            json.dump(data, file, indent=4)
-
-        print(f"Added new artist: {new_artist}\n")
-        return new_artist
 
         # In cat command, if you write 'set project' it should set this project as the environment variable. - done
         # Example:  cat --opens maya2025 --project "PROJECT_ABC" --domains <name> which will have attributes like "type/category/status" which can be queried when asked.
@@ -279,6 +196,7 @@ class CatCommand():
 
 if __name__ == "__main__":
     cat_command = CatCommand()
+    # utils_command = utils.UtilsCommand(self.artists_json_file, self.projects_json_file)
     cat_command.executeCode()
 
 
