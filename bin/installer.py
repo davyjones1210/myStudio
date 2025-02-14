@@ -1,3 +1,13 @@
+'''
+Mock Studio Pipeline Development with Subin Gopi - v0.1
+Date: Feb 14, 2025
+Author: Kunal Dekhane
+kunal.dekhane@gmail.com
+No Copyright 2025 Kunal Dekhane - No Rights Reserved, feel free to copy and distribute
+
+# WARNING! All changes made in this file will be lost!
+'''
+
 # importing os module to interact with operating system to set environment variables
 import os
 
