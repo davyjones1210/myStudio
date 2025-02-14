@@ -4,15 +4,16 @@ import os
 # from optparse module, importing OptionParser class
 from optparse import OptionParser
 
+class InstallerCommand():        
 
-def setup_studio_env(studio_name, environments):
-    # Creating a separate function to set and print environment variables
-    os.environ["STUDIO_NAME"] = studio_name
-    os.environ["ENV_FLAG"] = str(environments)
+    def setup_studio_env(self, studio_name, environments):
+        # Creating a separate function to set and print environment variables
+        os.environ["STUDIO_NAME"] = studio_name
+        os.environ["ENV_FLAG"] = str(environments)
 
-    
-    print("Studio Environment Variables Set:")
-    print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
+        
+        print("Studio Environment Variables Set:")
+        print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
 
 
 # Entry-point to the program. Code execution starts from here
@@ -30,7 +31,12 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     # Calls the above defined function and passes the various recognized options as arguments
-    setup_studio_env(options.studio_name, options.environments)
+
+    # Create an instance of InstallerCommand
+    installer = InstallerCommand()
+
+    # Call the setup_studio_env method
+    installer.setup_studio_env(options.studio_name, options.environments)
 
     if options.environments:
         # set PATH env           
@@ -70,5 +76,5 @@ if __name__ == "__main__":
         print("by passed, try with -e or --environment")
     
 
-# Command line prompt for demonstration
-# python3 optparse_Exercise.py --studio Framestore --nuke 13.2v4 --maya 2022 --artist 'Kunal Dekhane'
+    # Command line prompt for demonstration
+    # python3 optparse_Exercise.py --studio Framestore --nuke 13.2v4 --maya 2022 --artist 'Kunal Dekhane'
