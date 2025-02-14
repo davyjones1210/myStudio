@@ -94,3 +94,14 @@ def collectDCC(name, data):
 # In installer.py add another env variable called DATABASE_PATH
 
 # Next, create an argument for creating artist then name, id, email id.
+
+# 13-2-2025 agenda for tomorrow
+# Part of publishing
+# Tomorrow's class: Create version database - create .json file. When you start a publish project, need to create a version database.
+# version name, version id, domain id, project id, artist id, date created, status, department
+# Create a new folder in myStudio called 'publish' and there we will create multiple modules for publish database, one for handing maya, handling blender, handling different dccs
+
+# Configure the database - xamm and use pip install such that 'python -m pip install mysql-connector-python'
+# Migration of databases - migrate data from .json files to sql database using mySQL
+
+

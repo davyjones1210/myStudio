@@ -68,6 +68,9 @@ def executeCode():
         # check if project name exists in projects database
         project_found = False # Flag to track if project name is found
 
+        # cat.py is only for config and commands. All other execution should happen on utils.py
+        # Create class in utils.py
+
         # Load existing project database
         with open(projects_json_file, "r") as file:
             projects = json.load(file)
@@ -142,7 +145,10 @@ def executeCode():
         """
         Exapmples
         # cat --create-project "Project Name"
-        """        
+        """
+
+        # Think about revising code regularly. Code is not final, always. Feel free to refactor constantly. 
+        # Refactor: enhance your code.        
 
         returned_project_info = save_project(options.create_project)   
 
@@ -153,8 +159,8 @@ def executeCode():
     if options.create_domain:
         """
         Exapmples
-        # cat --create-domain "bat" --domain-cat <"asset">
-        # cat --create-domain "shot1" --domain-cat <"shot">
+        # cat --create-domain "bat" --domain-cat <"asset"> --project_id <project id>
+        # cat --create-domain "shot1" --domain-cat <"shot"> --project_id <project id>
         """
 
         utils.createDomain(options.create_domain, options.domain_cat)
