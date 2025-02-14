@@ -177,7 +177,7 @@ class UtilsCommand():
         return new_project
 
                 
-
+    # Notes:
     # os.environ["BLENDER_PLUG_IN_PATH"] = "E:/pipelineDevelopment/test1;E:/pipelineDevelopment/test2",        
     # os.environ["BLENDER_SCRIPT_PATH"] = "E:/pipelineDevelopment/test3;E:/pipelineDevelopment/test4",  
     # 

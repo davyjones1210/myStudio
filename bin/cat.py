@@ -32,8 +32,6 @@ class CatCommand():
             with open(self.projects_json_file, "w") as file:
                 json.dump([], file, indent=4)  # Empty list to store artist data
 
-        
-
 
     def executeCode(self):
         #Initialize optparser to parse command line prompt
@@ -41,7 +39,7 @@ class CatCommand():
         usage="usage: %prog\n\tInstaller to set up my studio pipeline",
         version="0.0.1",
         )
-        # Parsing command line arguments using add_option method of optparse
+        # Defining command line arguments using add_option method of optparse
         parser.add_option("-o", "--opens", dest="open", action = "store", help="Sets which dcc to open", default=None)
         parser.add_option("--create-artist", dest="create_artist", action = "store", help="Create name of artist", default=None)
         parser.add_option("--create-project", dest="create_project", action = "store", help="Create name of project", default=None)
@@ -56,8 +54,7 @@ class CatCommand():
         parser.add_option("-s", "--show", dest="show", action = "store", help="Sets name of show", default="Test_show")
         parser.add_option("-d", "--domain", dest="domain", action = "store", help="Sets domain name", default="Test_domain")
 
-
-        
+        # Parse command line arguments
         options, args = parser.parse_args()
         print("Print options:\n", options)
 
@@ -174,7 +171,7 @@ class CatCommand():
             utils_command.createDomain(options.create_domain, options.domain_cat)
             # cata --create-domain "ball" --domain_cata "asset"
     
-
+        # Notes:
         # In cat command, if you write 'set project' it should set this project as the environment variable. - done
         # Example:  cat --opens maya2025 --project "PROJECT_ABC" --domains <name> which will have attributes like "type/category/status" which can be queried when asked.
         
@@ -188,15 +185,11 @@ class CatCommand():
         # Create one more DB for CREATE_DOMAIN which create domain type, domain category and domain name.
         # Example, ball, bat, etc is Asset type, and name is 'ball', 'bat' etc category is 'modeling', 'rigging' etc
         # Domains are necessary during publishing stage.
-
-            
-
         
         # json_file = os.path.expandvars("%DATABASE_PATH%/artists.json")    # "E:/pipelineDevelopment/database/artists.json"
 
 if __name__ == "__main__":
     cat_command = CatCommand()
-    # utils_command = utils.UtilsCommand(self.artists_json_file, self.projects_json_file)
     cat_command.executeCode()
 
 
