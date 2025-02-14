@@ -35,7 +35,7 @@ if __name__ == "__main__":
     if options.environments:
         # set PATH env           
         path_name = "E:/pipelineDevelopment/sourcecodes/myStudio/bin"
-        os.environ["PATH"] = os.environ["PATH"] + ";" + path_name
+        os.environ["PATH"] = "%s;%s" % (os.environ["PATH"], path_name)
         os.environ["MY_BIN"] = path_name
         # print(os.environ["PATH"])
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
         # set project path
         project_path_name = "E:/pipelineDevelopment/project"        
-        os.environ["PROJECT_PATH"] = db_path_name
+        os.environ["PROJECT_PATH"] = project_path_name
         print("Project path: ", os.environ["PROJECT_PATH"])
                 
         os.system("cmd")
