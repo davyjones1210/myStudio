@@ -66,7 +66,7 @@ class CatCommand():
             """
             Examples - done
             # cat --open maya2025 --project proj1
-            # cat --open maya2025 --project proj1 --artist "Artist_name"
+            # cat --open maya2025 --project "proj1" --artist "Artist_name"
             # cat --open maya2025
             """      
             

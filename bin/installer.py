@@ -63,7 +63,7 @@ if __name__ == "__main__":
         # set pylib PATH env
         pylib_path_name = "E:/pipelineDevelopment/pylib"
         mystudio_path = "E:/pipelineDevelopment/sourcecodes/myStudio"
-        os.environ["PYTHONPATH"] = pylib_path_name + ";" + mystudio_path
+        os.environ["PYTHONPATH"] = pylib_path_name + ";" + mystudio_path + ";" 
         # print(os.environ["PYTHONPATH"])
 
         # set config path
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         print("Database path: ", os.environ["DATABASE_PATH"])
 
         # set project path
-        project_path_name = "E:/pipelineDevelopment/project"        
+        project_path_name = "E:/MyWorks/projects"        
         os.environ["PROJECT_PATH"] = project_path_name
         print("Project path: ", os.environ["PROJECT_PATH"])
                 
