@@ -87,8 +87,17 @@ class UtilsCommand():
                     env_name = env["env"]
                     env_paths = ";".join(env["path"])  # Join paths with ';'
                     os.environ[env_name] = env_paths   # Set environment variable        
-                os.system(dcc_path)
                 break  # Exit loop after the first match
+        else:
+            raise Exception("sssssssssssssssssssssssssss")
+        
+        # later remove this line
+        os.environ["PROJECT_ID"] = "201"
+        os.environ["DOMAIN_ID"] = "304"
+        os.environ["DOMAIN_CATEGORY"] = "Asset"
+    
+        os.system(dcc_path)
+
         if not found:  # If no match was found after looping
             print("DCC name not matching")
 
