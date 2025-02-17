@@ -159,7 +159,7 @@ class UtilsCommand():
             "name": full_name,
             "email": email
         }
-        artist_data.append(new_artist)
+        artists.append(new_artist)
 
         self.writeJson(self.artists_json_file, artists)
         print(f"Added new artist: {new_artist}\n")
