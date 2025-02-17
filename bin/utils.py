@@ -1,85 +1,51 @@
 import os
 import json
+import logging
 
-class UtilsCommand():
+class UtilsCommand():    
 
-    def __init__(self, artists_json_file, projects_json_file):
+    def __init__(self):
+
+        # Setup logging
+        logging.basicConfig(level=logging.INFO)
 
         self.DOMAIN_CAT = ["asset", "shot"]
 
         self.ASSET_CAT = [["asset", ["modeling", "rigging"]], ["shot", ["layout", "animation"]]]
-
-        self.artists_json_file = artists_json_file
-
-        self.projects_json_file = projects_json_file
-
+        # Define the JSON file for DCC data
+        self.dcc_data_filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
+        # Define the JSON file for artist db
+        self.artists_json_file = os.path.expandvars("%DATABASE_PATH%/artists.json")
+        # Define the JSON file for project db
+        self.projects_json_file = os.path.expandvars("%DATABASE_PATH%/projects.json")
         # Define the JSON file for domain db
-        self.domains_json_file = os.path.expandvars("%DATABASE_PATH%/domain.json")
+        self.domains_json_file = os.path.expandvars("%DATABASE_PATH%/domains.json")
 
-
+        self.initialize_json_file(self.artists_json_file)
+        self.initialize_json_file(self.projects_json_file)
+        self.initialize_json_file(self.domains_json_file)
+        
+    def initialize_json_file(self, json_file):
         # Initialize the JSON database if it doesn't exist
-        if not os.path.exists(self.domains_json_file):
-            with open(self.domains_json_file, "w") as file:
+        if not os.path.exists(json_file):
+            with open(json_file, "w") as file:
                 json.dump([], file, indent=4)  # Empty list to store artist data
 
-
-    def triggerOpen(self, name):
-        filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
-        data = self.readJoson(filepath)
-        # print("Data variable: ", data)
-        print("Options.open value passed: ", name)
-        self.collectDCC(name, data)
-
-    def createDomain(self, domain_name, domain_cat, start_id=301):
-        
-        # Load existing domain database
-        with open(self.domains_json_file, "r") as file:
-            domains = json.load(file)
-
-        # Check if the domain already exists
-        for domain in domains:
-            if domain["name"].lower() == domain_name.lower():  # Case-insensitive match
-                print(f"\nDomain '{domain_name}' already exists with category {domain['category']}")
-                return domain  # Return existing project entry
-            
-        
-        # Assign new domain ID (increment from highest existing ID)
-        if domains:
-            max_id = max(domain["id"] for domain in domains)
-        else:
-            max_id = start_id - 1  # Start from 201 if empty
-
-        new_id = max_id + 1
-
-        # Create new domain record
-        new_domain = {
-            "id": new_id,
-            "name": domain_name,
-            "category": domain_cat
-        }
-        domains.append(new_domain)
-
-        # Save updated domain database
-        with open(self.domains_json_file, "w") as file:
-            json.dump(domains, file, indent=4)
-
-        print(f"\nAdded new domain: {new_domain}")
-        return new_domain
-
-    # From this data variable, figure out the specific block from the list, if blender collect blender data, if maya, collect maya
-    # From the config find out what DCC was typed in cat --opens "here"
-
-
-
-    def readJoson(self, filepath):
+    def readJson(self, filepath):
+        # Reads the json filepath passed and returns the data
         with open(filepath, 'r') as openfile:
-            return json.load(openfile)
-        
+            return json.load(openfile)    
+    
+    def writeJson(self, filepath, data):
+        # Save updated domain database
+        with open(filepath, "w") as file:
+            json.dump(data, file, indent=4)
 
-    def collectDCC(self, name, data):
+    
+    def collectDCC(self, name, dcc_data):
         found = False  # Flag to track if DCC name is found
         # Extract and print 'envs' values
-        for software in data:        
+        for software in dcc_data:        
             if name == software['name']: 
                 found = True  # Set flag to True if a match is found           
                 dcc_path = software['path']
@@ -101,11 +67,62 @@ class UtilsCommand():
         if not found:  # If no match was found after looping
             print("DCC name not matching")
 
+    def triggerOpen(self, name):
+        # This function opens the DCC software based on the name passed
+        
+        dcc_data = self.readJson(self.dcc_data_filepath)
+        # print("Data variable: ", data)
+        print("Options.open value passed: ", name)
+        self.collectDCC(name, dcc_data)    
+     
+    def checkIfProjectExists(self, project_name):
+            # check if project name exists in projects database
+
+            project_found = False # Flag to track if project name is found            
+            # Load existing project database
+            projects = self.readJson(self.projects_json_file)
+            
+            # Check if the project already exists
+            for project in projects:
+                if project["name"].lower() == project_name.lower():  # Case-insensitive match
+                    project_found = True    # Set flag to True if a match is found 
+                    print(f"\nProject '{project["name"]}' already exists with ID {project['id']}")
+                    # Setup an environment variable for project
+                    os.environ["PROJECT_NAME"] = project["name"]
+                    print("\nProject env set to: ", os.environ["PROJECT_NAME"])
+                    return True                
+            if not project_found:
+                print(f"\nProject does not exist in database. Please add project in database using create-project flag")
+                return False
+            
+    def checkIfArtistExists(self, artist_name):
+            # check if artist name exists in artists database
+
+            artist_found = False # Flag to track if artist name is found
+
+            artists = self.readJson(self.artists_json_file)
+
+            # Check if the artist already exists
+            for artist in artists:
+                if artist["name"].lower() == artist_name.lower():  # Case-insensitive match
+                    artist_found = True    # Set flag to True if a match is found 
+                    print(f"\nArtist '{artist["name"]}' already exists with ID {artist['id']}, Email: {artist['email']}")
+                    # Setup an environment variable for artist
+                    # Create environment varibles which will store this user info
+                    os.environ["ARTIST_ID"] = str(artist["id"])
+                    os.environ["ARTIST_NAME"] = artist["name"]
+                    os.environ["ARTIST_EMAIL"] = artist["email"]
+                    logging.info(f"\nArtist env set to\nName: {os.environ["ARTIST_NAME"]}, ID: {os.environ["ARTIST_ID"]}, email: {os.environ["ARTIST_EMAIL"]}\n")
+                    return True 
+                    
+            if not artist_found:
+                print(f"\nArtist does not exist in database. Please add artist in database using create-artist flag")
+                return False
+                       
 
     def name_to_database(self, full_name, domain="example.com", start_id=101):
-        # Load existing artist database
-        with open(self.artists_json_file, "r") as file:
-            data = json.load(file)
+
+        artists = self.readJson(self.artists_json_file)
 
         # Remove quotes and split the name into parts
         name_parts = full_name.replace('"', '').split()
@@ -123,14 +140,14 @@ class UtilsCommand():
         email = f"{first_name}{middle_initial}{last_name}@{domain}" if middle_initial else f"{first_name}{last_name}@{domain}"
 
         # Check if email already exists in database
-        for artist in data:
+        for artist in artists:
             if artist["email"] == email:
                 print(f"Email {email} already exists with ID {artist['id']}")
                 return artist  # Return existing artist entry
 
         # Assign new ID (increment from highest existing ID)
-        if data:
-            max_id = max(artist["id"] for artist in data)
+        if artists:
+            max_id = max(artist["id"] for artist in artists)
         else:
             max_id = start_id - 1  # Start from 101 if empty
 
@@ -142,20 +159,16 @@ class UtilsCommand():
             "name": full_name,
             "email": email
         }
-        data.append(new_artist)
+        artist_data.append(new_artist)
 
-        # Save updated database
-        with open(self.artists_json_file, "w") as file:
-            json.dump(data, file, indent=4)
-
+        self.writeJson(self.artists_json_file, artists)
         print(f"Added new artist: {new_artist}\n")
         return new_artist
     
 
     def save_project(self, project_name, start_id=201):
-        # Load existing project database
-        with open(self.projects_json_file, "r") as file:
-            projects = json.load(file)
+        
+        projects = self.readJson(self.projects_json_file)        
 
         # Check if the project already exists
         for project in projects:
@@ -177,13 +190,71 @@ class UtilsCommand():
             "name": project_name
         }
         projects.append(new_project)
-
-        # Save updated project database
-        with open(self.projects_json_file, "w") as file:
-            json.dump(projects, file, indent=4)
+        self.writeJson(self.projects_json_file, projects)        
 
         print(f"\nAdded new project: {new_project}")
         return new_project
+
+    def createDomain(self, domain_name, domain_cat, start_id=301):
+        # This function creates a new domain in the database       
+
+        # Read existing domain database
+        domains = self.readJson(self.domains_json_file)        
+
+        # Check if the domain already exists
+        for domain in domains:
+            if domain["name"].lower() == domain_name.lower():  # Case-insensitive match
+                print(f"\nDomain '{domain_name}' already exists with category {domain['category']}")
+                return domain  # Return existing project entry            
+        
+        # Assign new domain ID (increment from highest existing ID)
+        if domains:
+            max_id = max(domain["id"] for domain in domains)
+        else:
+            max_id = start_id - 1  # Start from 201 if empty
+
+        new_id = max_id + 1
+        logging.info(f"\nChecked domain ID: {new_id}")
+
+        # Create new domain record
+        new_domain = {
+            "id": new_id,
+            "name": domain_name,
+            "category": domain_cat
+        }
+        logging.info(f"\nNew domain info: {new_domain}")
+        domains.append(new_domain)
+
+        self.writeJson(self.domains_json_file, domains)    
+
+        print(f"\nAdded new domain: {new_domain}")
+        return new_domain
+
+    # From this data variable, figure out the specific block from the list, if blender collect blender data, if maya, collect maya
+    # From the config find out what DCC was typed in cat --opens "here"
+
+    def runOpenCommand(self, options):
+        #Checking if artists' name exists in database
+        artist_validated = self.checkIfArtistExists(options.artist)
+        #Checking if project name exists in database
+        project_validated = self.checkIfProjectExists(options.project)
+                    
+        if artist_validated and project_validated:      # Trigger open only if artist name & project name match in db          
+            print("Triggering opening function now\n")                
+            self.triggerOpen(options.open)  
+
+    def runCreateArtistCommand(self, options):
+        returned_artist_info = self.name_to_database(options.create_artist)   
+        logging.info(f"\nArtist info in database\nName: {returned_artist_info["name"]}, ID: {str(returned_artist_info["id"])}, Artist ID: {str(returned_artist_info["id"])}")
+
+    def runcreateProjectCommand(self, options):
+        returned_project_info = self.save_project(options.create_project) 
+        logging.info(f"\nProject info in database\nName:: {returned_project_info["name"]}, Project ID: {str(returned_project_info["id"])}")
+
+    def runCreateDomainCommand(self, options):
+        returned_domain_info = self.createDomain(options.create_domain, options.domain_cat)
+        logging.info(f"\nDomain info in database\nName:: {returned_domain_info["name"]}, Domain ID: {str(returned_domain_info["id"])}")
+        # cata --create-domain "ball" --domain_cata "asset"
 
                 
     # Notes:
