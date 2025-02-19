@@ -54,7 +54,7 @@ def departmentPath(category, name, department):
 
 
 def fileExtension(filepath):
-    print("Filepath passed to fileExtension: ", filepath)
+    
     dirname, extension = os.path.splitext(filepath)
     return extension
      
@@ -93,7 +93,7 @@ def getCurrentVersion(category, name, department, typed):
                version["project"] == getProjectName() and
                version["type"] == typed
         ]
-        print("Filtered versions = ", filtered_versions)
+        
         if filtered_versions:
             return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
     return None
@@ -104,7 +104,7 @@ def nextVersion(currentVersion):
     """
     if currentVersion:  # If current version exists, proceed
         version_number = int(currentVersion[1:])  # Extracts the number part from the version string
-        next_version = f"v{version_number + 1}"
+        next_version = "v{}".format(version_number + 1)  # Using .format() for compatibility
     else:
         next_version = "v1"
     

@@ -17,6 +17,7 @@ def sourceFile(category, name, department):
     from publish import main
     importlib.reload(main)
     result = main.sourceFile("asset", "monkey", "modeling")
+    print(result)
     """
 
     print("\n\n")
@@ -30,16 +31,6 @@ def sourceFile(category, name, department):
 
     # registertation
     # adds entry in the database of this particular publish. A way to track the file.
-
-    # Example: 
-    # import importlib
-
-    # from publish import main
-    # importlib.reload(main)
-
-    # result = main.sourceFile("asset", "monkey", "modeling")
-
-    # print(result)
     # Types of source files: sourcefile, usd, dailies, movs, etc. This helps identify what kind of publish it is.
 
     #     
@@ -76,6 +67,9 @@ def usdFile(category, name, department):
     result = main.usdFile("asset", "monkey", "modeling")
     print(result)
     """
+    print("\n\n")
+    logging.info("Begins usd file publish")
+
     usd_filpath = blender_publish.usd_export(False, False, True, False, filepath=None)
     
     register_result = blender_publish.register(category, name, department, "usdFile")
@@ -107,6 +101,9 @@ def alembicFile(category, name, department):
     result = main.alembicFile("asset", "monkey", "modeling")
     print(result)
     """
+
+    print("\n\n")
+    logging.info("Begins alembic file publish")
     alembic_filpath = blender_publish.alembic_export(False, True, True, True, filepath=None)
 
     register_result = blender_publish.register(category, name, department, "alembicFile")
@@ -131,7 +128,16 @@ def alembicFile(category, name, department):
 
 
 def mp4File(category, name, department):
-    
+    # Get mp4 File
+    """
+    import importlib
+    from publish import main
+    importlib.reload(main)
+    result = main.mp4File("asset", "monkey", "modeling")
+    print(result)
+    """
+    print("\n\n")
+    logging.info("Begins mp4 file publish")
     mp4_filepath = blender_publish.mp4_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None)    
 
     register_result = blender_publish.register(category, name, department, "mp4File")
@@ -155,6 +161,16 @@ def mp4File(category, name, department):
     logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
 
 def movFile(category, name, department):
+    # Get mov File
+    """
+    import importlib
+    from publish import main
+    importlib.reload(main)
+    result = main.movFile("asset", "monkey", "modeling")
+    print(result)
+    """
+    print("\n\n")
+    logging.info("Begins mov file publish")
     
     mov_filepath = blender_publish.mov_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)    
 
