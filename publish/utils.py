@@ -84,7 +84,7 @@ def getCurrentVersion(category, name, department, typed):
     version_file = os.path.expandvars("%DATABASE_PATH%/versions.json")
     if os.path.exists(version_file):
         versions = readJsonFile(version_file)
-        # Filter versions based on category, name, department, and typed
+        # Filter versions based on category, name, department, project and typed
         filtered_versions = [
             version for version in versions
             if version["category"] == category and
