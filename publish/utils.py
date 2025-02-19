@@ -90,9 +90,10 @@ def getCurrentVersion(category, name, department, typed):
             if version["category"] == category and
                version["name"] == name and
                version["department"] == department and
+               version["project"] == getProjectName() and
                version["type"] == typed
         ]
-        
+        print("Filtered versions = ", filtered_versions)
         if filtered_versions:
             return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
     return None
