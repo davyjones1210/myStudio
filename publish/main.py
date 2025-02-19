@@ -43,7 +43,6 @@ def sourceFile(category, name, department):
 
     #     
     register_result = blender_publish.register(category, name, department, "sourcefile")
-
     logging.info("2: Successfully registered in our data base, {} {} {}".format(name, department, register_result["version"]))
 
     # Deployed

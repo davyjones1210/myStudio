@@ -1,5 +1,8 @@
 import os
 import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def readJsonFile(sourcefile):
     with open(sourcefile, "r") as file:
@@ -63,22 +66,30 @@ def getVersionFilepath(category, name, department, typed, version, extension):
         typed,
         version,
         "{}{}".format(name, extension),
-    )    
+    )  
     
     return filepath
 
-
 def getCurrentVersion(category, name, department):
     """
-    Exercise: Find how to get current version of a file and next version. If no current version exists, start with v1.
+    Exercise: Find how to get current version of a file and next version. If no current version exists, start with v1. Gets the current version of a file. If no current version exists, return None.
     """
+
+    version_file = os.path.expandvars("%DATABASE_PATH%/version.json")
+    if os.path.exists(version_file):
+        versions = readJsonFile(version_file)
+        if versions:            
+            return versions[-1]["version"]  # Returns the last stored version in version.json
     return None
 
-
 def nextVersion(currentVersion):
-    if currentVersion:
-        result = currentVersion + 1
+    """
+    Get the next version of a file. If no current version exists, start with 'v1'.
+    """
+    if currentVersion:  # If current version exists, proceed
+        version_number = int(currentVersion[1:])  # Extracts the number part from the version string
+        next_version = f"v{version_number + 1}"
     else:
-        result = "v1"
+        next_version = "v1"
     
-    return result
+    return next_version
