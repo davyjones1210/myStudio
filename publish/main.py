@@ -5,6 +5,7 @@ from publish import blender_publish
 
 logging.basicConfig(level=logging.INFO)
 
+
 def sourceFile(category, name, department):
     """
     import importlib
@@ -168,7 +169,7 @@ def movFile(category, name, department):
     print("\n\n")
     logging.info("Begins mov file publish")
     
-    mov_filepath = blender_publish.mov_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)    
+    mov_filepath = blender_publish.mov_export("FFMPEG", "QUICKTIME", 0, 9, 24, filepath=None)    
 
     register_result = blender_publish.register(category, name, department, "movFile")
 
@@ -198,3 +199,10 @@ def movFile(category, name, department):
 # Notes
 # Understand the code, don't try to understand code line by line
 # Avoid legacy steps
+
+# Exercise for 20-2-2025 - finish lookdev publish - source file & usd file.
+# Now we have all types of publishing files available for all types of publishing
+# In real life (studio requirements), for modeling, use usd or alembic with source file. For rigging, source file is enough
+# For alembic publish, also publish a thumbnail image for presentation.
+# Dependeancies - mdl > lookdev > rigging
+# Q: Create another function called build or generate 

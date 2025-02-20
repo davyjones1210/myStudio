@@ -5,6 +5,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+
 def readJsonFile(sourcefile):
     with open(sourcefile, "r") as file:
         data = json.load(file)
@@ -23,6 +24,7 @@ def writeJson(data):
 
     with open(filepath, "w") as file:
         file.write(json.dumps(finalData, indent=4)) 
+
 
 def getProjectName():
     return os.environ["PROJECT_NAME"]
@@ -97,6 +99,7 @@ def getCurrentVersion(category, name, department, typed):
         if filtered_versions:
             return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
     return None
+
 
 def nextVersion(currentVersion):
     """
