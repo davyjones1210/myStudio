@@ -1,6 +1,9 @@
 
-import shutil
 import os
+import shutil
+import getpass
+import datetime
+
 import bpy
 
 from publish import utils
@@ -142,6 +145,9 @@ def register(category, name, department, typed):
         "comment": "test publish",
         "project": utils.getProjectName(),
         "type": typed,
+        "status": None,
+        "createAt": datetime.datetime.now().strftime("%Y/%m/%d - %I:%M"),
+        "createBy": getpass.getuser(),
     }
 
     utils.writeJson(version_context)

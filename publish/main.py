@@ -1,15 +1,9 @@
 import logging
-import importlib
 
 from publish import utils
 from publish import blender_publish
 
-importlib.reload(utils)
-importlib.reload(blender_publish)
-
 logging.basicConfig(level=logging.INFO)
-
-
 
 def sourceFile(category, name, department):
     """
@@ -92,6 +86,7 @@ def usdFile(category, name, department):
 
     logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
 
+
 def alembicFile(category, name, department):
     # Get alembic File
     """
@@ -160,6 +155,7 @@ def mp4File(category, name, department):
 
     logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
 
+
 def movFile(category, name, department):
     # Get mov File
     """
@@ -193,23 +189,6 @@ def movFile(category, name, department):
     )
 
     logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
-
-
-def moviePublish(category, name, department):
-    """
-    from publish import main. Right now not doing anything.
-
-    """
-
-    result, output = main.movie(category, name, department)
-
-    print("\n", result, output)
-
-    if result:
-        main.register_version(category, name, department)
-
-    else:
-        logging.error("Your publish failed: %s" % output)
 
 
 # This is for source file publish. Create a new function for USD and Alembic publish
