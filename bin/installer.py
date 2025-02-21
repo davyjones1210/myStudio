@@ -14,6 +14,10 @@ import os
 # from optparse module, importing OptionParser class
 from optparse import OptionParser
 
+
+PIPELINE_DIRECTORY = "C:/works/pipeline"
+PROJECTS_DIRECTORY = "C:/works/projects"
+
 class InstallerCommand():        
 
     def setup_studio_env(self, studio_name, environments):
@@ -49,35 +53,36 @@ if __name__ == "__main__":
     installer.setup_studio_env(options.studio_name, options.environments)
 
     if options.environments:
-        # set PATH env           
-        path_name = "E:/pipelineDevelopment/sourcecodes/myStudio/bin"
+        # set PATH env    
+        path_name = os.path.join(PIPELINE_DIRECTORY, "sourcecodes/myStudio/bin")
         os.environ["PATH"] = "%s;%s" % (os.environ["PATH"], path_name)
         os.environ["MY_BIN"] = path_name
         # print(os.environ["PATH"])
 
         # set software PATH env
-        sw_path_name = "E:/pipelineDevelopment/software"
+        sw_path_name = os.path.join(PIPELINE_DIRECTORY, "software")
         os.environ["SOFTWARE_PATH"] = sw_path_name
         # print(os.environ["SOFTWARE_PATH"])
 
         # set pylib PATH env
-        pylib_path_name = "E:/pipelineDevelopment/pylib"
-        mystudio_path = "E:/pipelineDevelopment/sourcecodes/myStudio"
+        pylib_path_name = os.path.join(PIPELINE_DIRECTORY, "pylib")
+        mystudio_path = os.path.join(PIPELINE_DIRECTORY, "sourcecodes/myStudio")
         os.environ["PYTHONPATH"] = pylib_path_name + ";" + mystudio_path + ";" 
         # print(os.environ["PYTHONPATH"])
 
         # set config path
-        config_path_name = "E:/pipelineDevelopment/config"        
+        config_path_name = os.path.join(PIPELINE_DIRECTORY, "config")      
         os.environ["CONFIG_PATH"] = config_path_name
         # print(os.environ["CONFIG_PATH"])
 
         # set database path
-        db_path_name = "E:/pipelineDevelopment/database"        
+        db_path_name =  os.path.join(PIPELINE_DIRECTORY, "database")
+        print("\ndb_path_name", db_path_name) 
         os.environ["DATABASE_PATH"] = db_path_name
         print("Database path: ", os.environ["DATABASE_PATH"])
 
         # set project path
-        project_path_name = "E:/MyWorks/projects"        
+        project_path_name = PROJECTS_DIRECTORY    
         os.environ["PROJECT_PATH"] = project_path_name
         print("Project path: ", os.environ["PROJECT_PATH"])
                 
