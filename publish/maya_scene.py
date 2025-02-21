@@ -1,21 +1,15 @@
 from publish import utils
+from publish import broadcast
 
 from maya import cmds
 
-def source(category, name, department):
+def source():
     """
     Execute the publish process
     """
-    path = utils.departmentPath(category, name, department)
+    source_filpath = cmds.file(query=True, sceneName=True)
 
-    # path = %PROJECT_PATH%test1/asset/human/modeling
-    # path = %PROJECT_PATH%test1/shot/shot1/modeling
-
-    print(path)
-
-    # To extact the source file
-
-    return "/temp/human.ma"
+    return source_filpath
 
 
 def movie(category, name, department):
