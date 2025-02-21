@@ -1,8 +1,11 @@
 import logging
 import shutil
-
+import importlib
 from publish import utils
 from publish import broadcast
+
+import importlib
+importlib.reload(broadcast)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,8 +17,15 @@ def sourceFile(category, name, department):
     import importlib
     from publish import main
     importlib.reload(main)
+    main.PUBLISH_DCC = "blender"
     result = main.sourceFile("asset", "monkey", "modeling")
     print(result)
+
+    from publish import main
+    import importlib
+    importlib.reload(main)
+    main.PUBLISH_DCC = "maya"
+    result = main.sourceFile("asset", "dobby", "rigging")
     """
 
     print("\n\n")
@@ -31,8 +41,15 @@ def sourceFile(category, name, department):
         source_filpath = blender_scene.source()
 
     if PUBLISH_DCC == "maya":
+        import importlib
         from publish import maya_scene
+        importlib.reload(maya_scene)
         source_filpath = maya_scene.source()
+        
+    # Check if source_filpath is set properly
+    if not source_filpath:
+        raise Exception("Error: source file path could not be determined")
+
     
     logging.info("1: Successfully extarct current source file, {}".format(source_filpath))
 
@@ -227,7 +244,7 @@ def movFile(category, name, department):
     extension = utils.fileExtension(mov_filepath)
 
     target_filepath = utils.getVersionFilepath(
-        category,
+        ategory,
         name,
         department,
         "movFile",

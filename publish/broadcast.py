@@ -19,7 +19,7 @@ def register(category, name, department, typed, software):
         "comment": "test publish",
         "project": utils.getProjectName(),
         "type": typed,
-        "status": None,
+        "status": "Approved",
         "createAt": datetime.datetime.now().strftime("%Y/%m/%d - %I:%M"),
         "createBy": getpass.getuser(),
         "software": software,

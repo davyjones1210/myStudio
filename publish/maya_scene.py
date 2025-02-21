@@ -9,6 +9,10 @@ def source():
     """
     source_filpath = cmds.file(query=True, sceneName=True)
 
+    if not source_filpath:
+        raise Exception("Error: Maya scene has not been saved. Please save the scene before publishing.")
+
+
     return source_filpath
 
 
