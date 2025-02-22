@@ -1,2 +1,2 @@
-from publish import main
+from sourcecodes.myStudio.publish.broadcast import main
 main.sourceFile("asset", "monkey", "modeling")

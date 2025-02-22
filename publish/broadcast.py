@@ -1,29 +1,13 @@
-
-import shutil
 import os
-
-import bpy
+import shutil
+import getpass
+import datetime
 
 from publish import utils
 
+def register(category, name, department, typed, software):
 
-def source():
-    """
-    get saved blender file path
-    """
-    source_filpath = bpy.data.filepath
-
-    return source_filpath
-
-# def usd():
-    # export usd filer into temp 
-    # return temp location
-
-
-    
-def register(category, name, department, typed):
-
-    current_version = utils.getCurrentVersion(category, name, department)
+    current_version = utils.getCurrentVersion(category, name, department, typed)
     next_version = utils.nextVersion(current_version)
 
     # version context
@@ -33,7 +17,12 @@ def register(category, name, department, typed):
         "department": department, # modelling, rigging, etc
         "version": next_version,
         "comment": "test publish",
+        "project": utils.getProjectName(),
         "type": typed,
+        "status": "Approved",
+        "createAt": datetime.datetime.now().strftime("%Y/%m/%d - %I:%M"),
+        "createBy": getpass.getuser(),
+        "software": software,
     }
 
     utils.writeJson(version_context)
@@ -49,6 +38,4 @@ def deployed(source_filpath, target_filepath):
         )
     # This is the exact clone of the user saved file
     shutil.copy(source_filpath, target_filepath)
-
-
 

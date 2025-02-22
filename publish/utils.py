@@ -1,8 +1,10 @@
 import os
 import json
+import tempfile
 import logging
 
 logging.basicConfig(level=logging.INFO)
+
 
 def readJsonFile(sourcefile):
     with open(sourcefile, "r") as file:
@@ -12,7 +14,7 @@ def readJsonFile(sourcefile):
 
 def writeJson(data):
 
-    filepath = os.path.join(os.path.expandvars("%DATABASE_PATH%/version.json"))
+    filepath = os.path.join(os.path.expandvars("%DATABASE_PATH%/versions.json"))
     finalData = [data]
 
     if os.path.exists(filepath):
@@ -22,6 +24,7 @@ def writeJson(data):
 
     with open(filepath, "w") as file:
         file.write(json.dumps(finalData, indent=4)) 
+
 
 def getProjectName():
     return os.environ["PROJECT_NAME"]
@@ -53,9 +56,20 @@ def departmentPath(category, name, department):
 
 
 def fileExtension(filepath):
+    
     dirname, extension = os.path.splitext(filepath)
     return extension
      
+
+def getTempFilepath(extension):
+    """
+    Generate a temporary file path with the specified extension.
+    """
+    temp_dir = tempfile.gettempdir()
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
+    temp_file.close()
+    return temp_file.name
+
 
 def getVersionFilepath(category, name, department, typed, version, extension):
  
@@ -70,17 +84,28 @@ def getVersionFilepath(category, name, department, typed, version, extension):
     
     return filepath
 
-def getCurrentVersion(category, name, department):
+def getCurrentVersion(category, name, department, typed):
     """
-    Exercise: Find how to get current version of a file and next version. If no current version exists, start with v1. Gets the current version of a file. If no current version exists, return None.
+    Get the current version of a file for a specific combination of category, name, department, and typed.
+    If no current version exists, return None.
     """
-
-    version_file = os.path.expandvars("%DATABASE_PATH%/version.json")
+    version_file = os.path.expandvars("%DATABASE_PATH%/versions.json")
     if os.path.exists(version_file):
         versions = readJsonFile(version_file)
-        if versions:            
-            return versions[-1]["version"]  # Returns the last stored version in version.json
+        # Filter versions based on category, name, department, project and typed
+        filtered_versions = [
+            version for version in versions
+            if version["category"] == category and
+               version["name"] == name and
+               version["department"] == department and
+               version["project"] == getProjectName() and
+               version["type"] == typed
+        ]
+        
+        if filtered_versions:
+            return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
     return None
+
 
 def nextVersion(currentVersion):
     """
@@ -88,7 +113,7 @@ def nextVersion(currentVersion):
     """
     if currentVersion:  # If current version exists, proceed
         version_number = int(currentVersion[1:])  # Extracts the number part from the version string
-        next_version = f"v{version_number + 1}"
+        next_version = "v{}".format(version_number + 1)  # Using .format() for compatibility
     else:
         next_version = "v1"
     
