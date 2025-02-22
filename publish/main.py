@@ -1,57 +1,78 @@
 import logging
-import shutil
 import importlib
 from publish import utils
 from publish import broadcast
 
 import importlib
 importlib.reload(broadcast)
+importlib.reload(utils)
 
 logging.basicConfig(level=logging.INFO)
 
 PUBLISH_DCC = None
 
 
-def sourceFile(category, name, department):
-    """
-    import importlib
-    from publish import main
-    importlib.reload(main)
-    main.PUBLISH_DCC = "blender"
-    result = main.sourceFile("asset", "monkey", "modeling")
-    print(result)
-
-    from publish import main
-    import importlib
-    importlib.reload(main)
-    main.PUBLISH_DCC = "maya"
-    result = main.sourceFile("asset", "dobby", "rigging")
-    """
-
-    print("\n\n")
-
+def dcc_context(category, name, department,PUBLISH_DCC, typed="sourcefile"):
     if not PUBLISH_DCC:
-        raise Exception("Error could not set currennt publish software")
+        raise Exception("Error could not set current publish software")
 
     logging.info("Begins source file publish")
 
     # Get Source File
     if PUBLISH_DCC == "blender":
         from publish import blender_scene
-        source_filpath = blender_scene.source()
+        if typed=="sourcefile":
+            return blender_scene.source()
+        elif typed=="usdFile":
+            return blender_scene.usd_export(False, False, True, False, filepath=None)
+        elif typed=="alembicFile":
+            return blender_scene.alembic_export(False, True, True, True, filepath=None)
+        elif typed=="mp4File":
+            return blender_scene.motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None)
+        elif typed=="movFile":
+            return blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None) 
 
     if PUBLISH_DCC == "maya":
-        import importlib
         from publish import maya_scene
         importlib.reload(maya_scene)
-        source_filpath = maya_scene.source()
-        
+        if typed=="sourcefile":
+            return maya_scene.maya_source()
+        elif typed=="usdFile":
+            return maya_scene.maya_usd_export(False, False, True, False, filepath=None)
+        elif typed=="alembicFile":
+            return maya_scene.maya_alembic_export(False, True, 1, 5, filepath=None)
+        elif typed=="mp4File":
+            return maya_scene.maya_motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None) 
+        elif typed=="movFile":
+            return maya_scene.maya_motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)
+
+
+def sourceFile(category, name, department, typed):
+    """
+    import importlib
+    from publish import main
+    importlib.reload(main)
+    main.PUBLISH_DCC = "blender"
+    result = main.sourceFile("asset", "monkey", "modeling", "sourcefile")
+    print(result)
+
+    from publish import main
+    import importlib
+    importlib.reload(main)
+    main.PUBLISH_DCC = "maya"
+    result = main.sourceFile("asset", "dobby", "rigging", "sourcefile")
+    """
+
+    print("\n\n")
+
+    source_filpath = dcc_context(category, name, department,PUBLISH_DCC, typed)
+
     # Check if source_filpath is set properly
     if not source_filpath:
         raise Exception("Error: source file path could not be determined")
 
     
-    logging.info("1: Successfully extarct current source file, {}".format(source_filpath))
+    logging.info("1: Successfully extracted current source file, {}".format(source_filpath))
 
     # registertation
     # adds entry in the database of this particular publish. A way to track the file.
@@ -62,12 +83,13 @@ def sourceFile(category, name, department):
         category,
         name,
         department,
-        "sourcefile",
+        typed,
         PUBLISH_DCC,
     )
+
     logging.info(
         "2: Successfully registered in our data base, {} {} {}".format(
-            name, department, register_result["version"]
+            name, department, register_result["version"], typed
         )
     )
 
@@ -79,7 +101,7 @@ def sourceFile(category, name, department):
         category,
         name,
         department,
-        "sourcefile",
+        typed,
         register_result["version"],
         extension,
     )
@@ -95,169 +117,6 @@ def sourceFile(category, name, department):
         )
     )
 
-
-def usdFile(category, name, department):
-    # Get USD File
-    """
-    import importlib
-    from publish import main
-    importlib.reload(main)
-    result = main.usdFile("asset", "monkey", "modeling")
-    print(result)
-    """
-    print("\n\n")
-    logging.info("Begins usd file publish")
-
-    usd_filpath = blender_publish.usd_export(False, False, True, False, filepath=None)
-    
-    register_result = broadcast.register(category, name, department, "usdFile", PUBLISH_DCC)
-
-    extension = utils.fileExtension(usd_filpath)
-
-    target_filepath = utils.getVersionFilepath(
-        category,
-        name,
-        department,
-        "usdFile",
-        register_result["version"],
-        extension,
-    )
-
-    broadcast.deployed(
-        usd_filpath,
-        target_filepath,
-    )
-
-    logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
-
-
-def alembicFile(category, name, department):
-    # Get alembic File
-    """
-    import importlib
-    from publish import main
-    importlib.reload(main)
-    result = main.alembicFile("asset", "monkey", "modeling")
-    print(result)
-    """
-
-    print("\n\n")
-    logging.info("Begins alembic file publish")
-    alembic_filpath = blender_publish.alembic_export(False, True, True, True, filepath=None)
-
-    register_result = broadcast.register(category, name, department, "alembicFile", PUBLISH_DCC)
-
-    extension = utils.fileExtension(alembic_filpath)
-
-    target_filepath = utils.getVersionFilepath(
-        category,
-        name,
-        department,
-        "alembicFile",
-        register_result["version"],
-        extension,
-    )
-
-    broadcast.deployed(
-        alembic_filpath,
-        target_filepath,
-    )
-
-    logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
-
-
-def mp4File(category, name, department):
-    # Get mp4 File
-    """
-    import importlib
-    from publish import main
-    importlib.reload(main)
-    result = main.mp4File("asset", "monkey", "modeling")
-    print(result)
-    """
-    print("\n\n")
-    logging.info("Begins mp4 file publish")
-
-    if not PUBLISH_DCC:
-        raise Exception("Error could not set currennt publish software")
-
-    # Get Source File
-    if PUBLISH_DCC == "blender":
-        from publish import blender_scene
-        mp4_filepath = blender_scene.motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None)  
-
-    if PUBLISH_DCC == "maya":
-        from publish import maya_scene
-        mp4_filepath = maya_scene.motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None) 
-
-    register_result = broadcast.register(category, name, department, "mp4File", PUBLISH_DCC)
-
-    extension = utils.fileExtension(mp4_filepath)
-
-    target_filepath = utils.getVersionFilepath(
-        category,
-        name,
-        department,
-        "mp4File",
-        register_result["version"],
-        extension,
-    )
-
-    broadcast.deployed(
-        mp4_filepath,
-        target_filepath,
-    )
-
-    logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
-
-
-def movFile(category, name, department):
-    # Get mov File
-    """
-    import importlib
-    from publish import main
-    importlib.reload(main)
-    result = main.movFile("asset", "monkey", "modeling")
-    print(result)
-    """
-    print("\n\n")
-    logging.info("Begins mov file publish")
-    
-    if not PUBLISH_DCC:
-        raise Exception("Error could not set currennt publish software")
-
-    # Get Source File
-    if PUBLISH_DCC == "blender":
-        from publish import blender_scene
-        mov_filepath = blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)  
-
-    if PUBLISH_DCC == "maya":
-        from publish import maya_scene
-        mov_filepath = maya_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None) 
-
-
-    register_result = broadcast.register(
-        category, name, department, "movFile",
-        PUBLISH_DCC,
-    )
-
-    extension = utils.fileExtension(mov_filepath)
-
-    target_filepath = utils.getVersionFilepath(
-        ategory,
-        name,
-        department,
-        "movFile",
-        register_result["version"],
-        extension,
-    )
-
-    broadcast.deployed(
-        mov_filepath,
-        target_filepath,
-    )
-
-    logging.info("Successfully deployed version called {}, file path is {}".format(register_result["version"], target_filepath))
 
 
 # This is for source file publish. Create a new function for USD and Alembic publish

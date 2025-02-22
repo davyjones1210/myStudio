@@ -18,21 +18,21 @@ from optparse import OptionParser
 PIPELINE_DIRECTORY = "C:/works/pipeline"
 PROJECTS_DIRECTORY = "C:/works/projects"
 
-class InstallerCommand():        
+    
 
-    def setup_studio_env(self, studio_name, environments):
-        # Creating a separate function to set and print environment variables
-        os.environ["STUDIO_NAME"] = studio_name
-        os.environ["ENV_FLAG"] = str(environments)
+def setup_studio_env(studio_name, environments):
+    # Creating a separate function to set and print environment variables
+    os.environ["STUDIO_NAME"] = studio_name
+    os.environ["ENV_FLAG"] = str(environments)
 
-        
-        print("Studio Environment Variables Set:")
-        print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
+    
+    print("Studio Environment Variables Set:")
+    print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
 
 
 # Entry-point to the program. Code execution starts from here
 if __name__ == "__main__":
-    # First creating an object of class OptionParser which we imported above
+# First creating an object of class OptionParser which we imported above
     parser = OptionParser()
 
     # Using add_option to define various command line flags 
@@ -46,11 +46,8 @@ if __name__ == "__main__":
 
     # Calls the above defined function and passes the various recognized options as arguments
 
-    # Create an instance of InstallerCommand
-    installer = InstallerCommand()
-
     # Call the setup_studio_env method
-    installer.setup_studio_env(options.studio_name, options.environments)
+    setup_studio_env(options.studio_name, options.environments)
 
     if options.environments:
         # set PATH env    
@@ -89,7 +86,7 @@ if __name__ == "__main__":
         os.system("cmd")
     else:
         print("by passed, try with -e or --environment")
-    
+
 
     # Command line prompt for demonstration
     # python3 optparse_Exercise.py --studio Framestore --nuke 13.2v4 --maya 2022 --artist 'Kunal Dekhane'

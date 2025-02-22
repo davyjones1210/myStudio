@@ -62,7 +62,13 @@ def fileExtension(filepath):
      
 
 def getTempFilepath(extension):
-    return "{}{}".format(tempfile.mkdtemp(), extension)
+    """
+    Generate a temporary file path with the specified extension.
+    """
+    temp_dir = tempfile.gettempdir()
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
+    temp_file.close()
+    return temp_file.name
 
 
 def getVersionFilepath(category, name, department, typed, version, extension):
