@@ -90,7 +90,6 @@ def getVersionFilepath(category, name, department, typed, version, extension):
     return filepath
 
 def getCurrentVersion(category, name, department, typed):
-def getCurrentVersion(category, name, department, typed):
     """
     Get the current version of a file for a specific combination of category, name, department, and typed.
     If no current version exists, return None.

@@ -8,7 +8,6 @@ def source():
     get saved blender file path
     """
     source_filpath = bpy.data.filepath
-    print("source_filpath: ", source_filpath)
 
     return source_filpath
 
