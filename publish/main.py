@@ -2,9 +2,11 @@ import logging
 import importlib
 from publish import utils
 from publish import broadcast
+from publish import broadcast
 
 import importlib
 importlib.reload(broadcast)
+importlib.reload(utils)
 importlib.reload(utils)
 
 logging.basicConfig(level=logging.INFO)
@@ -54,6 +56,7 @@ def sourceFile(category, name, department, typed):
     importlib.reload(main)
     main.PUBLISH_DCC = "blender"
     result = main.sourceFile("asset", "monkey", "modeling", "sourcefile")
+    result = main.sourceFile("asset", "monkey", "modeling", "sourcefile")
     print(result)
 
     from publish import main
@@ -61,9 +64,12 @@ def sourceFile(category, name, department, typed):
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
     result = main.sourceFile("asset", "dobby", "rigging", "sourcefile")
+    result = main.sourceFile("asset", "dobby", "rigging", "sourcefile")
     """
 
     print("\n\n")
+
+    source_filpath = dcc_context(category, name, department,PUBLISH_DCC, typed)
 
     source_filpath = dcc_context(category, name, department,PUBLISH_DCC, typed)
 
@@ -72,6 +78,7 @@ def sourceFile(category, name, department, typed):
         raise Exception("Error: source file path could not be determined")
 
     
+    logging.info("1: Successfully extracted current source file, {}".format(source_filpath))
     logging.info("1: Successfully extracted current source file, {}".format(source_filpath))
 
     # registertation
@@ -84,11 +91,14 @@ def sourceFile(category, name, department, typed):
         name,
         department,
         typed,
+        typed,
         PUBLISH_DCC,
     )
 
+
     logging.info(
         "2: Successfully registered in our data base, {} {} {}".format(
+            name, department, register_result["version"], typed
             name, department, register_result["version"], typed
         )
     )
@@ -102,10 +112,12 @@ def sourceFile(category, name, department, typed):
         name,
         department,
         typed,
+        typed,
         register_result["version"],
         extension,
     )
 
+    broadcast.deployed(
     broadcast.deployed(
         source_filpath,
         target_filepath,
