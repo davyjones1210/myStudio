@@ -1,6 +1,8 @@
 import logging
+import shutil
 import importlib
 from publish import utils
+from publish import broadcast
 from publish import broadcast
 
 import importlib
@@ -109,6 +111,7 @@ def sourceFile(category, name, department, typed):
         extension,
     )
 
+    broadcast.deployed(
     broadcast.deployed(
         source_filpath,
         target_filepath,

@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 import maya.cmds as cmds
 from publish import utils
 
 
 
 def maya_source():
+=======
+from publish import utils
+from publish import broadcast
+
+from maya import cmds
+
+def source():
+>>>>>>> b61cdeca6964b9e85b5ab0ec66322390d0c9e504
     """
     Execute the publish process
     """
@@ -12,6 +21,7 @@ def maya_source():
     if not source_filpath:
         raise Exception("Error: Maya scene has not been saved. Please save the scene before publishing.")
 
+<<<<<<< HEAD
     return source_filpath
 
 def maya_usd_export(selected=False, animation=False, uvmaps=False, materials=False, filepath=None):
@@ -178,6 +188,11 @@ def maya_motion_export(file_format, video_format, frame_start, frame_end, fps, f
     return filepath
 
 
+=======
+
+    return source_filpath
+
+>>>>>>> b61cdeca6964b9e85b5ab0ec66322390d0c9e504
 
 def movie(category, name, department):
     """
