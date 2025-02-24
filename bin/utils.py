@@ -240,8 +240,11 @@ def runOpenCommand(options):
     artist_validated = checkIfArtistExists(options.artist)
     #Checking if project name exists in database
     project_validated = checkIfProjectExists(options.project)
-                
-    if artist_validated and project_validated:      # Trigger open only if artist name & project name match in db          
+
+    if not project_validated:
+        logging.warning("Your are not under any projects")             
+       
+    if artist_validated:      # Trigger open only if artist name & project name match in db          
         print("Triggering opening function now\n")                
         triggerOpen(options.open)  
 

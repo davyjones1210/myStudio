@@ -56,6 +56,9 @@ if __name__ == "__main__":
         os.environ["MY_BIN"] = path_name
         # print(os.environ["PATH"])
 
+        mystudio_path = os.path.join(PIPELINE_DIRECTORY, "sourcecodes/myStudio")
+        os.environ["SOURCE_CODE_PATH"] = mystudio_path
+
         # set software PATH env
         sw_path_name = os.path.join(PIPELINE_DIRECTORY, "software")
         os.environ["SOFTWARE_PATH"] = sw_path_name
@@ -63,7 +66,6 @@ if __name__ == "__main__":
 
         # set pylib PATH env
         pylib_path_name = os.path.join(PIPELINE_DIRECTORY, "pylib")
-        mystudio_path = os.path.join(PIPELINE_DIRECTORY, "sourcecodes/myStudio")
         os.environ["PYTHONPATH"] = pylib_path_name + ";" + mystudio_path + ";" 
         # print(os.environ["PYTHONPATH"])
 

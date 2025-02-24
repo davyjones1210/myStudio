@@ -53,8 +53,9 @@ def executeCode():
     if options.open:        
         """
         Examples - done
-        # cat --opens maya2025 --project proj1 (done)
-        # cat --opens maya2025 --project "proj1" --artist "Artist_name" (done)
+            cat --opens cproject
+            cat --opens maya2025 --project "proj1" --artist "Artist_name" (done)
+            cat --opens maya2025 --project proj1 (done)
         """
         utils.runOpenCommand(options)      
         
