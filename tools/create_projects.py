@@ -2,7 +2,7 @@ from PySide6 import QtGui
 from PySide6 import QtCore
 from PySide6 import QtWidgets
 
-from publish import create
+from publish import broadcast
 
 class Widget(QtWidgets.QWidget):
 
@@ -81,16 +81,17 @@ class Widget(QtWidgets.QWidget):
     
     def createProject(self):
         input = {
-            "longname": self.lineedit_longname.text(),
+            # "longname": self.lineedit_longname.text(),
             "name": self.lineedit_name.text(),
             "description": self.lineedit_description.text(),
         }
 
         import importlib
-        importlib.reload(create)
+        importlib.reload(broadcast)
         
-        create.project(input)
-        print("Worke in progress")
+        broadcast._register_("project",  input)  
+
+
 
 
 if __name__ == "__main__":

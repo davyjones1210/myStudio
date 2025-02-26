@@ -4,6 +4,31 @@ import getpass
 import datetime
 
 from publish import utils
+from publish import database
+
+PROJECT_FIELDS = [
+    "id",
+    "name",
+    "createdBy",
+    "createdAt",
+    "description",
+    "remark",
+]
+
+ARTISTS_FIELDS = [
+    "id",
+    "email",
+    "name",
+    "password",
+]
+
+
+def _register_(table, data):
+    myda = database.myDatabase()
+    myda.connect()
+    myda.insert(table, data)
+    # Print regisering done
+
 
 def register(category, name, department, typed, software):
 

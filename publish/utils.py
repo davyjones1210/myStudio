@@ -1,7 +1,6 @@
 import os
 import json
 import tempfile
-import tempfile
 import logging
 
 logging.basicConfig(level=logging.INFO)

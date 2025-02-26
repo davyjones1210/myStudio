@@ -14,6 +14,7 @@ import os
 # from optparse module, importing OptionParser class
 from optparse import OptionParser
 
+import utils
 
 PIPELINE_DIRECTORY = "C:/works/pipeline"
 PROJECTS_DIRECTORY = "C:/works/projects"
@@ -30,16 +31,14 @@ def setup_studio_env(studio_name, environments):
     print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
 
 
-# Entry-point to the program. Code execution starts from here
-if __name__ == "__main__":
-# First creating an object of class OptionParser which we imported above
+def execute():
+    # First creating an object of class OptionParser which we imported above
+
     parser = OptionParser()
 
     # Using add_option to define various command line flags 
     parser.add_option("-s", "--studio", dest="studio_name", help="Set the studio name", default="KD_Studio")
     parser.add_option("-e", "--environment", action = "store_true", dest = "environments", default = False, help = "Set up the pipeline command and primary environments")
-
-
 
     # Reads command-line arguments and Splits them into recognized options and positional arguments.
     (options, args) = parser.parse_args()
@@ -47,7 +46,13 @@ if __name__ == "__main__":
     # Calls the above defined function and passes the various recognized options as arguments
 
     # Call the setup_studio_env method
-    setup_studio_env(options.studio_name, options.environments)
+    # setup_studio_env(options.studio_name, options.environments)
+    utils.set_environments("STUDIO_NAME", options.studio_name)
+    utils.set_environments("ENV_FLAG", str(options.environments))
+
+    print("Studio Environment Variables Set:")
+    print(f"STUDIO_NAME: {os.environ['STUDIO_NAME']}")
+    print(f"ENV_FLAG: {os.environ['ENV_FLAG']}")
 
     if options.environments:
         # set PATH env    
@@ -91,4 +96,8 @@ if __name__ == "__main__":
 
 
     # Command line prompt for demonstration
-    # python3 optparse_Exercise.py --studio Framestore --nuke 13.2v4 --maya 2022 --artist 'Kunal Dekhane'
+    # python3 optparse_Exercise.py --studio Framestore --nuke 13.2v4 --maya 2022 --artist 'Kunal Dekhane'    
+
+# Entry-point to the program. Code execution starts from here
+if __name__ == "__main__":
+    execute()

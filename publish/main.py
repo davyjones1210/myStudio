@@ -87,7 +87,14 @@ def sourceFile(category, name, department, typed):
         typed,
         PUBLISH_DCC,
     )
-
+    
+    register_result = broadcast.register(
+            category,
+            name,
+            department,
+            typed,
+            PUBLISH_DCC,
+        )
 
     logging.info("2: Successfully registered in our data base, {} {} {}".format(
             name, department, register_result["version"], typed
