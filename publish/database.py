@@ -20,6 +20,21 @@ class myDatabase(object):
             cursorclass=pymysql.cursors.DictCursor,
         ) 
     
+    def query(self, table, columns="*", conditions=None):
+        self.connect()
+        cursor = self.conn.cursor()
+        sql = f"SELECT {columns} FROM {table}"
+        if conditions:
+            sql += f" WHERE {conditions}"
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        self.conn.close()
+        return result
+
+    # def getCategories(self):
+    #     return self.query("category", "name")
+
+    
     def searchAll(self, table):
     
         cursor= self.conn.cursor() 
@@ -29,24 +44,23 @@ class myDatabase(object):
   
         # fetch all the matching rows  
         result = cursor.fetchall() 
+        print("Printing result of fetch all: ", result)
   
         return result
     
     def insert(self, table, data):
         # Inserts what table you want to insert and what value
-        # Bonus: Add multiple values
-
         cursor = self.conn.cursor()
 
-        keys = ", ".join(list(data.keys()))
-        values = "\'{}\'".format("\', \'".join(list(data.values())))
+        keys = ", ".join(data.keys())
+        values = ", ".join(["%s"] * len(data))
 
         id = self.getLatestID(table)
-        # name, createdBy
-        # test_1, Owner
         next_id = id + 1
 
-        cursor.execute('INSERT INTO project (id, {}) VALUES ({}, {})'.format(keys, next_id, values))
+        sql = f'INSERT INTO {table} (id, {keys}) VALUES (%s, {values})'
+        print("Printing sql query sent: ", sql, (next_id, *data.values()))
+        cursor.execute(sql, (next_id, *data.values()))
 
         self.conn.commit()
         self.conn.close()
@@ -56,39 +70,32 @@ class myDatabase(object):
         return data
     
     def getLatestID(self, table):
-        # data = getlatestInsert(table)
-        # return data["id"] # or data[0]
-        # Find out how to setup auto increment in GUI. Working on code is first preference to get next ID
-        # Such that 
+        # This method should return the latest ID from the table
+        cursor = self.conn.cursor()
+        cursor.execute(f"SELECT MAX(id) as max_id FROM {table}")
+        result = cursor.fetchone()
+        return result['max_id'] if result['max_id'] is not None else 200
 
-        return 200
 
-    def query(self, table, key, value):
-        # [{'email': 'kunal@gmail.com', 'id': 101, 'name': 'kunal', 'password': 'kunal'},
-        #     {'email': 'sachin@gmail.com',
-        #   'id': 102,
-        #   'name': 'sachin',
-        #   'password': 'password'}]
-        pass
 
-    def mysqlconnect(): 
-        # To connect MySQL database 
-        conn = pymysql.connect( 
-            host='localhost', 
-            user='root', 
-            password = "pass", 
-            db='College', 
-            ) 
+    # def mysqlconnect(): 
+    #     # To connect MySQL database 
+    #     conn = pymysql.connect( 
+    #         host='localhost', 
+    #         user='root', 
+    #         password = "pass", 
+    #         db='College', 
+    #         ) 
         
-        cur = conn.cursor() 
-        cur.execute("select @@version") 
-        output = cur.fetchall() 
-        print(output) 
+    #     cur = conn.cursor() 
+    #     cur.execute("select @@version") 
+    #     output = cur.fetchall() 
+    #     print(output) 
         
         # To close the connection 
-        conn.close() 
+        # conn.close() 
 
-# Driver Code 
-if __name__ == "__main__" :
-    pass
-	# mysqlconnect()
+# # Driver Code 
+# if __name__ == "__main__" :
+#     pass
+# 	# mysqlconnect()
