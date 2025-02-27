@@ -307,24 +307,26 @@ class CreateDomainWidget(QtWidgets.QWidget):
     
     def populateProjects(self):
         db = myDatabase()
-        projects = db.query("projects", "name")
+        projects = db.query("projects", "id, name")
         
-        # Add projects to the combobox
+        # Store project IDs and names
+        self.project_ids = {}
         for project in projects:
             self.combobox_project.addItem(project['name'])
+            self.project_ids[project['name']] = project['id']
     
     def createDomain(self):
         input = {
             "name": self.lineedit_name.text(),
             "category": self.combobox_category.currentText(),
             "department": self.combobox_department.currentText(),
-            "project": self.combobox_project.currentText()
+            "project_id": self.project_ids[self.combobox_project.currentText()]
         }
         import importlib
         importlib.reload(broadcast)
         broadcast._register_("domains",  input) 
         self.close()  # Close the CreateDomainWidget window after creating the domain
-        
+                
         
 class MainMenu(QtWidgets.QWidget):
     def __init__(self, parent=None):
