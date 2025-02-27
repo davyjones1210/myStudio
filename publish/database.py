@@ -31,8 +31,6 @@ class myDatabase(object):
         self.conn.close()
         return result
 
-    # def getCategories(self):
-    #     return self.query("category", "name")
 
     
     def searchAll(self, table):
@@ -58,16 +56,16 @@ class myDatabase(object):
         id = self.getLatestID(table)
         next_id = id + 1
 
-        sql = f'INSERT INTO {table} (id, {keys}) VALUES (%s, {values})'
-        print("Printing sql query sent: ", sql, (next_id, *data.values()))
+        sql = 'INSERT INTO {} (id, {}) VALUES (%s, {})'.format(table, keys, values)
+        print("Printing sql execute command sent: ", sql, (next_id, *data.values()))
         cursor.execute(sql, (next_id, *data.values()))
 
         self.conn.commit()
         self.conn.close()
     
-    def getlatestInsert(self, table):
+    # def getlatestInsert(self, table):
 
-        return data
+    #     return data
     
     def getLatestID(self, table):
         # This method should return the latest ID from the table
