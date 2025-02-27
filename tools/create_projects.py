@@ -1,7 +1,11 @@
 import getpass
 from PySide6 import QtGui, QtCore, QtWidgets
+
+from publish import utils
 from publish import broadcast
 from publish.database import myDatabase
+# This should not happen because we want to follow some disciple to see what comes from where.
+
 
 class CreateProjectWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -270,12 +274,12 @@ class CreateDomainWidget(QtWidgets.QWidget):
         input = {
             "name": self.lineedit_name.text(),
             "category": self.combobox_category.currentText(),
+            "project": int(utils.environmantValue("PROJECT_ID"))
         }
         import importlib
         importlib.reload(broadcast)
         broadcast._register_("domain",  input) 
         self.close()  # Close the CreateDomainWidget window after creating the domain
-
 
 class MainMenu(QtWidgets.QWidget):
     def __init__(self, parent=None):

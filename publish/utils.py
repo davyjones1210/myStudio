@@ -6,6 +6,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
+def environmantValue(key):
+    return os.environ[key]
 
 def readJsonFile(sourcefile):
     with open(sourcefile, "r") as file:

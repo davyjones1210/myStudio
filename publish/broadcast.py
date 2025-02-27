@@ -23,6 +23,21 @@ ARTISTS_FIELDS = [
 ]
 
 
+def getAllDomains():
+    # query category from data base table
+    return ["Asset", "Shot"]
+
+
+def getCategoryFromDomain(name, projectID=None):
+    projectID = projectID or int(utils.environmantValue("PROJECT_ID"))
+    
+    #Query domain from domain table filter based name and project id
+    category = "Asset"
+    index = 0
+
+    return category, index
+
+
 def _register_(table, data):
     myda = database.myDatabase()
     myda.connect()

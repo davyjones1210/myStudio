@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 PUBLISH_DCC = None
 
 
-def dcc_context(category, name, department,PUBLISH_DCC, typed="sourcefile"):
+def dcc_context(category, name, department, PUBLISH_DCC, typed="sourcefile"):
     if not PUBLISH_DCC:
         raise Exception("Error could not set current publish software")
 

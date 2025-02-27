@@ -79,14 +79,17 @@ def checkIfProjectExists(project_name):
         for project in projects:
             if project["name"].lower() == project_name.lower():  # Case-insensitive match
                 project_found = True    # Set flag to True if a match is found
-                print("\nProject '{}' already exists with ID {}".format(
-        project["name"], project['id']
-    )
-)
+                print(
+                    "\nProject '{}' already exists with ID {}".format(
+                        project["name"], project['id']
+                    )
+                )
                 # Setup an environment variable for project
                 os.environ["PROJECT_NAME"] = project["name"]
-                print("\nProject env set to: ", os.environ["PROJECT_NAME"])
-                return True                
+                os.environ["PROJECT_ID"] = str(project["id"])
+               
+                print("\nProject env set to: ", os.environ["PROJECT_NAME"], os.environ["PROJECT_ID"])
+                return True             
         if not project_found:
             print(f"\nProject does not exist in database. Please add project in database using create-project flag")
             return False
@@ -240,6 +243,8 @@ def runOpenCommand(options):
     artist_validated = checkIfArtistExists(options.artist)
     #Checking if project name exists in database
     project_validated = checkIfProjectExists(options.project)
+
+    os.environ["DOMAIN_NAME"] = "human"
 
     if not project_validated:
         logging.warning("Your are not under any projects")             
