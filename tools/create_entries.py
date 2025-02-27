@@ -1,5 +1,6 @@
 import getpass
 from PySide6 import QtGui, QtCore, QtWidgets
+import datetime
 
 from publish import utils
 from publish import broadcast
@@ -76,11 +77,12 @@ class CreateProjectWidget(QtWidgets.QWidget):
             "name": self.lineedit_name.text(),
             "abbreviation": self.lineedit_abbreviation.text(),
             "createdBy": getpass.getuser(),
+            "createdAt": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "description": self.lineedit_description.text(),
         }
         import importlib
         importlib.reload(broadcast)
-        broadcast._register_("project",  input) 
+        broadcast._register_("projects",  input) 
         self.close()  # Close the CreateProjectWidget window after creating the project
  
 class CreateArtistWidget(QtWidgets.QWidget):
@@ -252,13 +254,39 @@ class CreateDomainWidget(QtWidgets.QWidget):
         self.combobox_category = QtWidgets.QComboBox(self)
         self.gridLayout.addWidget(self.combobox_category, 1, 1, 1, 1)
         
-        # Populate the category dropdown
+        # Department Dropdown
+        self.label_department = QtWidgets.QLabel(self)
+        self.label_department.setText("Department: ")
+        self.label_department.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignRight
+            | QtCore.Qt.AlignmentFlag.AlignTrailing
+            | QtCore.Qt.AlignmentFlag.AlignVCenter
+        )
+        self.gridLayout.addWidget(self.label_department, 2, 0, 1, 1)
+        self.combobox_department = QtWidgets.QComboBox(self)
+        self.gridLayout.addWidget(self.combobox_department, 2, 1, 1, 1)
+        
+        # Project Dropdown
+        self.label_project = QtWidgets.QLabel(self)
+        self.label_project.setText("Project: ")
+        self.label_project.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignRight
+            | QtCore.Qt.AlignmentFlag.AlignTrailing
+            | QtCore.Qt.AlignmentFlag.AlignVCenter
+        )
+        self.gridLayout.addWidget(self.label_project, 3, 0, 1, 1)
+        self.combobox_project = QtWidgets.QComboBox(self)
+        self.gridLayout.addWidget(self.combobox_project, 3, 1, 1, 1)
+        
+        # Populate the category, department, and project dropdowns
         self.populateCategories()
+        self.populateDepartments()
+        self.populateProjects()
         
         # Create Button
         self.pushbutton_create = QtWidgets.QPushButton(self)
         self.pushbutton_create.setText("Create")
-        self.gridLayout.addWidget(self.pushbutton_create, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.pushbutton_create, 4, 1, 1, 1)
         self.pushbutton_create.clicked.connect(self.createDomain)
     
     def populateCategories(self):
@@ -269,18 +297,35 @@ class CreateDomainWidget(QtWidgets.QWidget):
         for category in categories:
             self.combobox_category.addItem(category['name'])
     
+    def populateDepartments(self):
+        db = myDatabase()
+        departments = db.query("departments", "name")
+        
+        # Add departments to the combobox
+        for department in departments:
+            self.combobox_department.addItem(department['name'])
+    
+    def populateProjects(self):
+        db = myDatabase()
+        projects = db.query("projects", "name")
+        
+        # Add projects to the combobox
+        for project in projects:
+            self.combobox_project.addItem(project['name'])
     
     def createDomain(self):
         input = {
             "name": self.lineedit_name.text(),
             "category": self.combobox_category.currentText(),
-            "project": int(utils.environmantValue("PROJECT_ID"))
+            "department": self.combobox_department.currentText(),
+            "project": self.combobox_project.currentText()
         }
         import importlib
         importlib.reload(broadcast)
-        broadcast._register_("domain",  input) 
+        broadcast._register_("domains",  input) 
         self.close()  # Close the CreateDomainWidget window after creating the domain
-
+        
+        
 class MainMenu(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(MainMenu, self).__init__(parent)
