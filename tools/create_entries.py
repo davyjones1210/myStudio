@@ -419,8 +419,9 @@ class LoadDCCWidget(QtWidgets.QWidget):
         # Check if the project exists
         if broadcast.checkIfProjectExistsInDB(project):
             # Placeholder for the load DCC logic
-            print(f"Loading {dcc} for project {project} and domain {domain}")
-            bin_utils.triggerOpen(dcc)
+            if broadcast.checkIfDomainExistsInDB(domain):
+                print(f"Loading {dcc} for project {project} and domain {domain}")
+                bin_utils.triggerOpen(dcc)
 
 
 class MainMenu(QtWidgets.QWidget):

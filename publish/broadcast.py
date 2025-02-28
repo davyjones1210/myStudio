@@ -37,6 +37,31 @@ def getCategoryFromDomain(name, projectID=None):
 
     return category, index
 
+def checkIfDomainExistsInDB(domain_name):
+    # Check if domain name exists in domains database
+
+    domain_found = False  # Flag to track if domain name is found
+    db = database.myDatabase()
+    domains = db.query("domains", "name, id")
+
+    # Check if the domain already exists
+    for domain in domains:
+        if domain["name"].lower() == domain_name.lower():  # Case-insensitive match
+            domain_found = True  # Set flag to True if a match is found
+            print(
+                "\nDomain '{}' already exists with ID {}".format(
+                    domain["name"], domain['id']
+                )
+            )
+            # Setup an environment variable for domain
+            os.environ["DOMAIN_NAME"] = domain["name"]
+            os.environ["DOMAIN_ID"] = str(domain["id"])
+
+            print("\nDomain env set to: ", os.environ["DOMAIN_NAME"], os.environ["DOMAIN_ID"])
+            return True
+    if not domain_found:
+        print(f"\nDomain does not exist in database. Please add domain in database using create-domain flag")
+        return False
 
 def checkIfProjectExistsInDB(project_name):
     # check if project name exists in projects database

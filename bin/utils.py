@@ -278,8 +278,6 @@ def set_environments(key, value):
     os.environ[key] = value
 
 
-
-
 if __name__ == "__main__":    
 
     initialize_json_file(artists_json_file)
