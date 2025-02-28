@@ -7,7 +7,7 @@ class myDatabase(object):
         self.hot = "127.0.0.1"
         self.user = "root"
         self.password = None
-        self.db = "test-db-kd4"
+        self.db = "test-db-kd6"
 
         self.conn = None
 		

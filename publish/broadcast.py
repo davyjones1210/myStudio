@@ -2,6 +2,7 @@ import os
 import shutil
 import getpass
 import datetime
+from pprint import pprint  # Import pprint module
 
 from publish import utils
 from publish import database
@@ -23,10 +24,23 @@ ARTISTS_FIELDS = [
 ]
 
 
-def getAllDomains():
-    # query category from data base table
-    return ["Asset", "Shot"]
 
+
+def getAllCategories():
+    db = database.myDatabase()
+    return db.query("category", "name")
+
+def getAllDepartments():
+    db = database.myDatabase()
+    return db.query("departments", "name")
+
+def getAllProjects():
+    db = database.myDatabase()
+    return db.query("projects", "name, id")
+
+def getAllDomains():
+    db = database.myDatabase()
+    return db.query("domains", "name")
 
 def getCategoryFromDomain(name, projectID=None):
     projectID = projectID or int(utils.environmantValue("PROJECT_ID"))
@@ -98,44 +112,74 @@ def _register_(table, data):
     myda.insert(table, data)
     # Print regisering done
 
+def get_category_id(category_name):
+    db = database.myDatabase()
+    conditions = f"LOWER(name) = LOWER('{category_name}')"
+    result = db.query("category", "id", conditions)
+    return result[0]['id'] if result else None
+
+def get_department_id(department_name):
+    db = database.myDatabase()
+    conditions = f"LOWER(name) = LOWER('{department_name}')"
+    result = db.query("departments", "department_id", conditions)
+    return result[0]['department_id'] if result else None
+
+def get_project_id(project_name):
+    db = database.myDatabase()
+    conditions = f"LOWER(name) = LOWER('{project_name}')"
+    result = db.query("projects", "id", conditions)
+    return result[0]['id'] if result else None
+
+
 def getCurrentVersionFromDB(category, name, department, typed):
     """
     Get the current version of a file for a specific combination of category, name, department, and typed from the database.
     If no current version exists, return None.
     """
     db = database.myDatabase()
-    versions = db.query("versions", "category, name, department, project, type, version")
+    versions = db.query("versions", "category_id, name, department_id, project_id, type, version")
     
-    # Filter versions based on category, name, department, project and typed
+    # Get the IDs for category, department, and project
+    category_id = get_category_id(category)
+    department_id = get_department_id(department)
+    project_id = get_project_id(utils.getProjectName())
+
+    # Filter versions based on category_id, name, department_id, project_id and typed
     filtered_versions = [
         version for version in versions
-        if version["category"].lower() == category.lower() and
+        if version["category_id"] == category_id and
            version["name"].lower() == name.lower() and
-           version["department"].lower() == department.lower() and
-           version["project"].lower() == os.environ.get("PROJECT_NAME", "").lower() and
+           version["department_id"] == department_id and
+           version["project_id"] == project_id and
            version["type"].lower() == typed.lower()
     ]
 
-    print("List of available versions:\n", filtered_versions)
-    
+    print("List of available versions:")
+    pprint(filtered_versions)  # Use pprint to print the list neatly
+
     if filtered_versions:
         return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
     return None
 
 
-def register(category, name, department, typed, software):
 
+def register(category, name, department, typed, software):
     current_version = getCurrentVersionFromDB(category, name, department, typed)
     next_version = utils.nextVersion(current_version)
 
+    # Get the IDs for category, department, and project
+    category_id = get_category_id(category)
+    department_id = get_department_id(department)
+    project_id = get_project_id(utils.getProjectName())
+
     # version context
     version_context = {
-        "name": name, # monkey
-        "category": category, #Asset or shot
-        "department": department, # modelling, rigging, etc
+        "name": name,  # monkey
+        "category_id": category_id,  # Asset or shot
+        "department_id": department_id,  # modelling, rigging, etc
         "version": next_version,
         "comment": "test publish",
-        "project": utils.getProjectName(),
+        "project_id": project_id,
         "type": typed,
         "status": "Approved",
         "createdAt": datetime.datetime.now().strftime("%Y/%m/%d - %I:%M"),
@@ -144,7 +188,7 @@ def register(category, name, department, typed, software):
     }
 
     _register_("versions", version_context)
-    #utils.writeJson(version_context)
+    # utils.writeJson(version_context)
 
     return version_context
 

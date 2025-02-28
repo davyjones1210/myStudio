@@ -1,9 +1,8 @@
 import getpass
 from PySide6 import QtGui, QtCore, QtWidgets
 import datetime
-import bin.utils as bin_utils
+import commonLib.triggerOpen as triggerOpen
 from publish import broadcast
-from publish.database import myDatabase
 # This should not happen because we want to follow some disciple to see what comes from where.
 
 
@@ -289,24 +288,21 @@ class CreateDomainWidget(QtWidgets.QWidget):
         self.pushbutton_create.clicked.connect(self.createDomain)
     
     def populateCategories(self):
-        db = myDatabase()
-        categories = db.query("category", "name")
+        categories = broadcast.getAllCategories()
         
         # Add categories to the combobox
         for category in categories:
             self.combobox_category.addItem(category['name'])
     
     def populateDepartments(self):
-        db = myDatabase()
-        departments = db.query("departments", "name")
+        departments = broadcast.getAllDepartments()
         
         # Add departments to the combobox
         for department in departments:
             self.combobox_department.addItem(department['name'])
     
     def populateProjects(self):
-        db = myDatabase()
-        projects = db.query("projects", "id, name")
+        projects = broadcast.getAllProjects()
         
         # Store project IDs and names
         self.project_ids = {}
@@ -394,16 +390,14 @@ class LoadDCCWidget(QtWidgets.QWidget):
         self.pushbutton_load.clicked.connect(self.loadDCC)
     
     def populateProjects(self):
-        db = myDatabase()
-        projects = db.query("projects", "name")
+        projects = broadcast.getAllProjects()
         
         # Add projects to the combobox
         for project in projects:
             self.combobox_project.addItem(project['name'])
     
     def populateDomains(self):
-        db = myDatabase()
-        domains = db.query("domains", "name")
+        domains = broadcast.getAllDomains()
         
         # Add domains to the combobox
         for domain in domains:
@@ -421,7 +415,7 @@ class LoadDCCWidget(QtWidgets.QWidget):
             # Placeholder for the load DCC logic
             if broadcast.checkIfDomainExistsInDB(domain):
                 print(f"Loading {dcc} for project {project} and domain {domain}")
-                bin_utils.triggerOpen(dcc)
+                triggerOpen.triggerOpen(dcc)
 
 
 class MainMenu(QtWidgets.QWidget):
