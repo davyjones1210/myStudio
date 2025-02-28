@@ -1,8 +1,7 @@
 import getpass
 from PySide6 import QtGui, QtCore, QtWidgets
 import datetime
-
-from publish import utils
+import bin.utils as bin_utils
 from publish import broadcast
 from publish.database import myDatabase
 # This should not happen because we want to follow some disciple to see what comes from where.
@@ -327,7 +326,103 @@ class CreateDomainWidget(QtWidgets.QWidget):
         broadcast._register_("domains",  input) 
         self.close()  # Close the CreateDomainWidget window after creating the domain
                 
+class LoadDCCWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(LoadDCCWidget, self).__init__(parent)
+        self.resize(400, 200)
+        self.setWindowTitle("Load DCC")
+        self.verticallayout = QtWidgets.QVBoxLayout(self)
+        self.label_header = QtWidgets.QLabel(self)
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        font.setBold(True)
+        self.label_header.setFont(font)
+        self.label_header.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignCenter
+        )
+        self.label_header.setText("Load DCC")
+        self.verticallayout.addWidget(self.label_header)
         
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.verticallayout.addLayout(self.gridLayout)
+        
+        # DCC Dropdown
+        self.label_dcc = QtWidgets.QLabel(self)
+        self.label_dcc.setText("DCC: ")
+        self.label_dcc.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignRight
+            | QtCore.Qt.AlignmentFlag.AlignTrailing
+            | QtCore.Qt.AlignmentFlag.AlignVCenter
+        )
+        self.gridLayout.addWidget(self.label_dcc, 0, 0, 1, 1)
+        self.combobox_dcc = QtWidgets.QComboBox(self)
+        self.combobox_dcc.addItems(["Maya", "Blender"])
+        self.gridLayout.addWidget(self.combobox_dcc, 0, 1, 1, 1)
+        
+        # Project Dropdown
+        self.label_project = QtWidgets.QLabel(self)
+        self.label_project.setText("Project: ")
+        self.label_project.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignRight
+            | QtCore.Qt.AlignmentFlag.AlignTrailing
+            | QtCore.Qt.AlignmentFlag.AlignVCenter
+        )
+        self.gridLayout.addWidget(self.label_project, 1, 0, 1, 1)
+        self.combobox_project = QtWidgets.QComboBox(self)
+        self.gridLayout.addWidget(self.combobox_project, 1, 1, 1, 1)
+        
+        # Domain Dropdown
+        self.label_domain = QtWidgets.QLabel(self)
+        self.label_domain.setText("Domain: ")
+        self.label_domain.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignRight
+            | QtCore.Qt.AlignmentFlag.AlignTrailing
+            | QtCore.Qt.AlignmentFlag.AlignVCenter
+        )
+        self.gridLayout.addWidget(self.label_domain, 2, 0, 1, 1)
+        self.combobox_domain = QtWidgets.QComboBox(self)
+        self.gridLayout.addWidget(self.combobox_domain, 2, 1, 1, 1)
+        
+        # Populate the project and domain dropdowns
+        self.populateProjects()
+        self.populateDomains()
+        
+        # Load Button
+        self.pushbutton_load = QtWidgets.QPushButton(self)
+        self.pushbutton_load.setText("Load")
+        self.gridLayout.addWidget(self.pushbutton_load, 3, 1, 1, 1)
+        self.pushbutton_load.clicked.connect(self.loadDCC)
+    
+    def populateProjects(self):
+        db = myDatabase()
+        projects = db.query("projects", "name")
+        
+        # Add projects to the combobox
+        for project in projects:
+            self.combobox_project.addItem(project['name'])
+    
+    def populateDomains(self):
+        db = myDatabase()
+        domains = db.query("domains", "name")
+        
+        # Add domains to the combobox
+        for domain in domains:
+            self.combobox_domain.addItem(domain['name'])
+    
+    def loadDCC(self):
+        dcc = self.combobox_dcc.currentText().lower()
+        if dcc == "blender":
+            dcc = "blender4.0"
+        project = self.combobox_project.currentText()
+        domain = self.combobox_domain.currentText()
+        
+        # Check if the project exists
+        if bin_utils.checkIfProjectExistsInDB(project):
+            # Placeholder for the load DCC logic
+            print(f"Loading {dcc} for project {project} and domain {domain}")
+            bin_utils.triggerOpen(dcc)
+
+
 class MainMenu(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(MainMenu, self).__init__(parent)
@@ -362,7 +457,11 @@ class MainMenu(QtWidgets.QWidget):
         self.pushbutton_create_category.setText("Create Category")
         self.gridLayout.addWidget(self.pushbutton_create_category, 3, 0, 1, 1)
         self.pushbutton_create_category.clicked.connect(self.openCreateCategory)
-    
+        self.pushbutton_load_dcc = QtWidgets.QPushButton(self)
+        self.pushbutton_load_dcc.setText("Load DCC")
+        self.gridLayout.addWidget(self.pushbutton_load_dcc, 4, 0, 1, 1)
+        self.pushbutton_load_dcc.clicked.connect(self.openLoadDCC)
+
     def openCreateProject(self):
         self.create_project_widget = CreateProjectWidget()
         self.create_project_widget.show()
@@ -378,6 +477,10 @@ class MainMenu(QtWidgets.QWidget):
     def openCreateCategory(self):
         self.create_category_widget = CreateCategoryWidget()
         self.create_category_widget.show()
+
+    def openLoadDCC(self):
+        self.load_dcc_widget = LoadDCCWidget()
+        self.load_dcc_widget.show()
 
 if __name__ == "__main__":
     import sys
