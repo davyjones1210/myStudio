@@ -80,13 +80,6 @@ def sourceFile(category, name, department, typed):
     # Types of source files: sourcefile, usd, dailies, movs, etc. This helps identify what kind of publish it is.
 
     #     
-    register_result = broadcast.register(
-        category,
-        name,
-        department,
-        typed,
-        PUBLISH_DCC,
-    )
     
     register_result = broadcast.register(
             category,
@@ -104,6 +97,7 @@ def sourceFile(category, name, department, typed):
     # Deployed
     # Means ready for distribution of the file to be saved somewhere in the project directory for use downstream.
     extension = utils.fileExtension(source_filpath)
+    print("Extension: ", extension)
 
     target_filepath = utils.getVersionFilepath(
         category,
@@ -113,6 +107,7 @@ def sourceFile(category, name, department, typed):
         register_result["version"],
         extension,
     )
+    print("target_filepath: ", target_filepath)
     
     broadcast.deployed(
         source_filpath,

@@ -98,10 +98,34 @@ def _register_(table, data):
     myda.insert(table, data)
     # Print regisering done
 
+def getCurrentVersionFromDB(category, name, department, typed):
+    """
+    Get the current version of a file for a specific combination of category, name, department, and typed from the database.
+    If no current version exists, return None.
+    """
+    db = database.myDatabase()
+    versions = db.query("versions", "category, name, department, project, type, version")
+    
+    # Filter versions based on category, name, department, project and typed
+    filtered_versions = [
+        version for version in versions
+        if version["category"].lower() == category.lower() and
+           version["name"].lower() == name.lower() and
+           version["department"].lower() == department.lower() and
+           version["project"].lower() == os.environ.get("PROJECT_NAME", "").lower() and
+           version["type"].lower() == typed.lower()
+    ]
+
+    print("List of available versions:\n", filtered_versions)
+    
+    if filtered_versions:
+        return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
+    return None
+
 
 def register(category, name, department, typed, software):
 
-    current_version = utils.getCurrentVersion(category, name, department, typed)
+    current_version = getCurrentVersionFromDB(category, name, department, typed)
     next_version = utils.nextVersion(current_version)
 
     # version context
@@ -114,12 +138,13 @@ def register(category, name, department, typed, software):
         "project": utils.getProjectName(),
         "type": typed,
         "status": "Approved",
-        "createAt": datetime.datetime.now().strftime("%Y/%m/%d - %I:%M"),
-        "createBy": getpass.getuser(),
+        "createdAt": datetime.datetime.now().strftime("%Y/%m/%d - %I:%M"),
+        "createdBy": getpass.getuser(),
         "software": software,
     }
 
-    utils.writeJson(version_context)
+    _register_("versions", version_context)
+    #utils.writeJson(version_context)
 
     return version_context
 

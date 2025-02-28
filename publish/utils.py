@@ -40,11 +40,8 @@ def getProjectPath():
     Get project details from database by ID
     """
     
-    projects = readJsonFile(os.path.expandvars("%DATABASE_PATH%/projects.json"))
-
-    for project in projects:
-        if project["name"] == getProjectName():
-            return os.path.abspath(os.path.join(os.environ["PROJECT_PATH"], project["name"]))
+    project_name = getProjectName()
+    return os.path.abspath(os.path.join(os.environ["PROJECT_PATH"], project_name))
 
     return None
 
@@ -80,6 +77,7 @@ def getTempFilepath(extension):
 def getVersionFilepath(category, name, department, typed, version, extension):
  
     department_path = departmentPath(category, name, department)
+    print("department_path: ", department_path)
 
     filepath = os.path.join(
         department_path,

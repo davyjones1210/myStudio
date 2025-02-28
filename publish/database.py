@@ -46,19 +46,27 @@ class myDatabase(object):
   
         return result
     
+    
     def insert(self, table, data):
-        # Inserts what table you want to insert and what value
         cursor = self.conn.cursor()
+
+        # Check if the table has an 'id' column
+        cursor.execute(f"SHOW COLUMNS FROM {table} LIKE 'id'")
+        id_column_exists = cursor.fetchone() is not None
 
         keys = ", ".join(data.keys())
         values = ", ".join(["%s"] * len(data))
 
-        id = self.getLatestID(table)
-        next_id = id + 1
-
-        sql = 'INSERT INTO {} (id, {}) VALUES (%s, {})'.format(table, keys, values)
-        print("Printing sql execute command sent: ", sql, (next_id, *data.values()))
-        cursor.execute(sql, (next_id, *data.values()))
+        if id_column_exists:
+            id = self.getLatestID(table)
+            next_id = id + 1
+            sql = f'INSERT INTO {table} (id, {keys}) VALUES (%s, {values})'
+            print("Printing sql execute command sent: ", sql, (next_id, *data.values()))
+            cursor.execute(sql, (next_id, *data.values()))
+        else:
+            sql = f'INSERT INTO {table} ({keys}) VALUES ({values})'
+            print("Printing sql execute command sent: ", sql, tuple(data.values()))
+            cursor.execute(sql, tuple(data.values()))
 
         self.conn.commit()
         self.conn.close()
