@@ -17,9 +17,7 @@ from optparse import OptionParser
 import utils
 
 PIPELINE_DIRECTORY = "C:/works/pipeline"
-PROJECTS_DIRECTORY = "C:/works/projects"
-
-    
+PROJECTS_DIRECTORY = "C:/works/projects"    
 
 def setup_studio_env(studio_name, environments):
     # Creating a separate function to set and print environment variables

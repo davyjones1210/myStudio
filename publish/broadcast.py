@@ -38,6 +38,34 @@ def getCategoryFromDomain(name, projectID=None):
     return category, index
 
 
+def checkIfProjectExistsInDB(project_name):
+    # check if project name exists in projects database
+
+    project_found = False # Flag to track if project name is found            
+    db = database.myDatabase()
+    projects = db.query("projects", "name, id")
+    
+    # Check if the project already exists
+    for project in projects:
+        if project["name"].lower() == project_name.lower():  # Case-insensitive match
+            project_found = True    # Set flag to True if a match is found
+            print(
+                "\nProject '{}' already exists with ID {}".format(
+                    project["name"], project['id']
+                )
+            )
+            # Setup an environment variable for project
+            os.environ["PROJECT_NAME"] = project["name"]
+            os.environ["PROJECT_ID"] = str(project["id"])
+           
+            print("\nProject env set to: ", os.environ["PROJECT_NAME"], os.environ["PROJECT_ID"])
+            return True             
+    if not project_found:
+        print(f"\nProject does not exist in database. Please add project in database using create-project flag")
+        return False
+
+
+
 def _register_(table, data):
     myda = database.myDatabase()
     myda.connect()

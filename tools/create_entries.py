@@ -417,7 +417,7 @@ class LoadDCCWidget(QtWidgets.QWidget):
         domain = self.combobox_domain.currentText()
         
         # Check if the project exists
-        if bin_utils.checkIfProjectExistsInDB(project):
+        if broadcast.checkIfProjectExistsInDB(project):
             # Placeholder for the load DCC logic
             print(f"Loading {dcc} for project {project} and domain {domain}")
             bin_utils.triggerOpen(dcc)
