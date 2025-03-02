@@ -9,18 +9,15 @@ logging.basicConfig(level=logging.INFO)
 PUBLISH_DCC = None
 
 
-# def  search(category, name, department, typed, version=None, approved=True):
-#     """
-#     Use this fucntion to search for versions in the specific context passed as argument. Just search for it
-#     """
-#     # 1. find versions database
-#     # 2. Search for latest version of typed file and arguments passed
-#     # 3. Return info
-
-
-
-#     version = utils.getVersion(category, name, department, typed, version, approved)   
-#     print("Filtered version: ", version)
+def search(PUBLISH_DCC, category, name, department, typed, version=None, approved=True):
+    """
+    Use this fucntion to search for versions in the specific context passed as argument. Just search for it
+    """
+    # 1. find versions database
+    # 2. Search for latest version of typed file and arguments passed
+    # 3. Return info
+    
+    return utils.getVersion(PUBLISH_DCC, category, name, department, typed, version, approved)
 
 
 def sourceFile(category, name, department, typed, version=None, approved=True):
@@ -47,9 +44,9 @@ def sourceFile(category, name, department, typed, version=None, approved=True):
     # Search Source File
     if PUBLISH_DCC == "blender":
         import bpy
-        searched_version = utils.getVersion(PUBLISH_DCC, category, name, department, typed, version, approved) 
+        searched_version = search(PUBLISH_DCC, category, name, department, typed, version, approved) 
         print("Filtered version: ", searched_version)
-        logging.info("\1. successfully found specified version")
+        logging.info("\1. successfully found specified version")        
         # If that version exists get the file path where the source file is saved
         if searched_version:
             version_path = utils.getFilepath(searched_version)
@@ -62,9 +59,9 @@ def sourceFile(category, name, department, typed, version=None, approved=True):
 
     if PUBLISH_DCC == "maya":
         import maya.cmds as cmds
-        searched_version = utils.getVersion(PUBLISH_DCC, category, name, department, typed, version, approved) 
-        print("Filtered version: ", searched_version)
+        searched_version = search(PUBLISH_DCC, category, name, department, typed, version, approved)
         logging.info("\1. successfully found specified version")
+        
         # If that version exists get the file path where the source file is saved
         if searched_version:
             version_path = utils.getFilepath(searched_version)

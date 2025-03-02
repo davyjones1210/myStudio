@@ -35,18 +35,17 @@ def getProjectName():
     return os.environ["PROJECT_NAME"]
 
 
-def getProjectPath():
+def getProjectPath(project):
     """
     Get project details from database by ID
     """
     
-    project_name = getProjectName()
-    return os.path.abspath(os.path.join(os.environ["PROJECT_PATH"], project_name))
+    return os.path.abspath(os.path.join(os.environ["PROJECT_PATH"], project))
 
     return None
 
 
-def departmentPath(category, name, department):
+def departmentPath(category, name, department, project):
     """
     category = "asset"
     name = "human"
@@ -54,7 +53,7 @@ def departmentPath(category, name, department):
     utils.departmentPath(category, name, department)
     """
 
-    return  os.path.abspath(os.path.join(getProjectPath(), category, name, department))
+    return  os.path.abspath(os.path.join(getProjectPath(project), category, name, department))
 
 
 def fileExtension(filepath):
@@ -74,10 +73,9 @@ def getTempFilepath(extension):
     return temp_file.name
 
 
-def getVersionFilepath(category, name, department, typed, version, extension):
+def getVersionFilepath(category, name, department, project, typed, version, extension):
  
-    department_path = departmentPath(category, name, department)
-    print("department_path: ", department_path)
+    department_path = departmentPath(category, name, department, project)
 
     filepath = os.path.join(
         department_path,
