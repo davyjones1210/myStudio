@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-import commonLib.triggerOpen as triggerOpen
+# import commonLib.triggerOpen as triggerOpen
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -10,7 +10,7 @@ DOMAIN_CAT = ["asset", "shot"]
 
 ASSET_CAT = [["asset", ["modeling", "rigging"]], ["shot", ["layout", "animation"]]]
 # # Define the JSON file for DCC data
-# dcc_data_filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
+dcc_data_filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
 # Define the JSON file for artist db
 artists_json_file = os.path.expandvars("%DATABASE_PATH%/artists.json")
 # Define the JSON file for project db
@@ -35,38 +35,38 @@ def writeJson(filepath, data):
         json.dump(data, file, indent=4)
 
 
-# def collectDCC(name, dcc_data):
-#     found = False  # Flag to track if DCC name is found
-#     # Extract and print 'envs' values
-#     for software in dcc_data:        
-#         if name == software['name']: 
-#             found = True  # Set flag to True if a match is found           
-#             dcc_path = software['path']
-#             for env in software["envs"]:
-#                 env_name = env["env"]
-#                 env_paths = ";".join(env["path"])  # Join paths with ';'
-#                 os.environ[env_name] = env_paths   # Set environment variable        
-#             break  # Exit loop after the first match
-#     else:
-#         raise Exception("sssssssssssssssssssssssssss")
+def collectDCC(name, dcc_data):
+    found = False  # Flag to track if DCC name is found
+    # Extract and print 'envs' values
+    for software in dcc_data:        
+        if name == software['name']: 
+            found = True  # Set flag to True if a match is found           
+            dcc_path = software['path']
+            for env in software["envs"]:
+                env_name = env["env"]
+                env_paths = ";".join(env["path"])  # Join paths with ';'
+                os.environ[env_name] = env_paths   # Set environment variable        
+            break  # Exit loop after the first match
+    else:
+        raise Exception("sssssssssssssssssssssssssss")
     
-#     # later remove this line
-#     os.environ["PROJECT_ID"] = "201"
-#     os.environ["DOMAIN_ID"] = "304"
-#     os.environ["DOMAIN_CATEGORY"] = "Asset"
+    # later remove this line
+    os.environ["PROJECT_ID"] = "201"
+    os.environ["DOMAIN_ID"] = "304"
+    os.environ["DOMAIN_CATEGORY"] = "Asset"
 
-#     os.system(dcc_path)
+    os.system(dcc_path)
 
-#     if not found:  # If no match was found after looping
-#         print("DCC name not matching")
+    if not found:  # If no match was found after looping
+        print("DCC name not matching")
 
-# def triggerOpen(name):
-#     # This function opens the DCC software based on the name passed
+def triggerOpen(name):
+    # This function opens the DCC software based on the name passed
     
-#     dcc_data = readJson(dcc_data_filepath)
-#     # print("Data variable: ", data)
-#     print("Options.open value passed: ", name)
-#     collectDCC(name, dcc_data)    
+    dcc_data = readJson(dcc_data_filepath)
+    # print("Data variable: ", data)
+    print("Options.open value passed: ", name)
+    collectDCC(name, dcc_data)    
 
 def checkIfProjectExists(project_name):
         # check if project name exists in projects database
@@ -251,7 +251,7 @@ def runOpenCommand(options):
        
     if artist_validated:      # Trigger open only if artist name & project name match in db          
         print("Triggering opening function now\n")                
-        triggerOpen.triggerOpen(options.open)  
+        triggerOpen(options.open)  
 
 def runCreateArtistCommand(options):
     returned_artist_info = name_to_database(options.create_artist)   

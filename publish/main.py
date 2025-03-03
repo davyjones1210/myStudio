@@ -97,12 +97,13 @@ def sourceFile(category, name, department, typed):
     # Deployed
     # Means ready for distribution of the file to be saved somewhere in the project directory for use downstream.
     extension = utils.fileExtension(source_filpath)
-    print("Extension: ", extension)
+    project = utils.getProjectName()
 
     target_filepath = utils.getVersionFilepath(
         category,
         name,
         department,
+        project,
         typed,
         register_result["version"],
         extension,
