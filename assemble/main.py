@@ -1,5 +1,7 @@
 import logging
 import importlib
+import tempfile
+import os
 from assemble import utils
 importlib.reload(utils)
 
@@ -37,43 +39,113 @@ def sourceFile(category, name, department, typed, version=None, approved=True):
     """
 
     if not PUBLISH_DCC:
-        raise Exception("Error could not set currennt publish software")
+        raise Exception("Error: PUBLISH_DCC is not set")
 
     logging.info("0. Begins source file search")
 
-    # Search Source File
     if PUBLISH_DCC == "blender":
-        import bpy
-        searched_version = search(PUBLISH_DCC, category, name, department, typed, version, approved) 
-        print("Filtered version: ", searched_version)
-        logging.info("\1. successfully found specified version")        
-        # If that version exists get the file path where the source file is saved
-        if searched_version:
-            version_path = utils.getFilepath(searched_version)
-            print("Version path: ", version_path)
-            logging.info("\2. successfully located specified version path")
+        load_blender_file(category, name, department, typed, version, approved)
+    elif PUBLISH_DCC == "maya":
+        load_maya_file(category, name, department, typed, version, approved)
+    else:
+        raise Exception("Error: Unsupported DCC software")
 
-            # Load the .blend file in Blender using bpy
-            bpy.ops.wm.open_mainfile(filepath=version_path)
-            logging.info("\3. successfully opened {} version in dcc".format(searched_version["version"]))
-
-    if PUBLISH_DCC == "maya":
-        import maya.cmds as cmds
-        searched_version = search(PUBLISH_DCC, category, name, department, typed, version, approved)
-        logging.info("\1. successfully found specified version")
-        
-        # If that version exists get the file path where the source file is saved
-        if searched_version:
-            version_path = utils.getFilepath(searched_version)
-            print("Version path: ", version_path)
-            logging.info("\2. successfully located specified version path")
-
-            # Load the .ma file in Maya using cmds
-            cmds.file(version_path, open=True, force=True)
-            logging.info("\3. successfully opened {} version in dcc".format(searched_version["version"]))
-
-    
+def load_blender_file(category, name, department, typed, version, approved):
     """
+    Load the specified version of a Blender file.
+    """
+    import bpy
+    searched_version = search(PUBLISH_DCC, category, name, department, typed, version, approved)
+    logging.info("1. Successfully found specified version")
+
+    if searched_version:
+        version_path = utils.getFilepath(searched_version)
+        logging.info("2. Successfully located specified version path: %s", version_path)
+
+        bpy.ops.wm.open_mainfile(filepath=version_path)
+        logging.info("3. Successfully opened %s version in Blender", searched_version["version"])
+
+def load_maya_file(category, name, department, typed, version, approved):
+    """
+    Load the specified version of a Maya file.
+    """
+    import maya.cmds as cmds
+    searched_version = search(PUBLISH_DCC, category, name, department, typed, version, approved)
+    logging.info("1. Successfully found specified version")
+
+    if searched_version:
+        version_path = utils.getFilepath(searched_version)
+        logging.info("2. Successfully located specified version path: %s", version_path)
+
+        cmds.file(version_path, open=True, force=True)
+        logging.info("3. Successfully opened %s version in Maya", searched_version["version"])
+
+
+def assembleScene(category, name, department, typed, *assets):
+    """
+    Assemble a scene in Maya with the specified assets as references.
+    """
+    if PUBLISH_DCC != "maya":
+        raise Exception("Error: PUBLISH_DCC is not set to 'maya'")
+
+    import maya.cmds as cmds
+
+    logging.info("0. Begins assembling scene")
+
+    for asset in assets:
+        version_path = get_asset_version_path(asset, department, typed)
+        if version_path:
+            reference_asset_in_scene(asset, version_path)
+        else:
+            logging.info("1. Could not find specified version for asset: %s", asset)
+
+    logging.info("4. End for loop for assembling the scene with all assets")
+
+    layout_scene_path = save_layout_scene(name)
+    logging.info("5. Successfully saved the layout scene to %s", layout_scene_path)
+
+    return layout_scene_path
+
+def get_asset_version_path(asset, department, typed):
+    """
+    Get the file path for the specified asset version.
+    """
+    searched_version = search(PUBLISH_DCC, "asset", asset, department, typed)
+    logging.info("1. Successfully found specified version for asset: %s", asset)
+
+    if searched_version:
+        version_path = utils.getFilepath(searched_version)
+        logging.info("2. Successfully located specified version path for asset: %s", version_path)
+        return version_path
+    return None
+
+def reference_asset_in_scene(asset, version_path):
+    """
+    Reference the asset in the Maya scene.
+    """
+    import maya.cmds as cmds
+
+    file_type = "mayaAscii" if version_path.endswith(".ma") else "mayaBinary"
+    reference_node = cmds.file(version_path, reference=True, type=file_type, ignoreVersion=True, gl=True, mergeNamespacesOnClash=False, namespace=asset, options="v=0;")
+    logging.info("3. Successfully referenced %s in the scene", asset)
+
+    cmds.file(reference_node, loadReference=True)
+    logging.info("4. Successfully reloaded reference for %s", asset)
+
+def save_layout_scene(name):
+    """
+    Save the layout scene in a temporary location.
+    """
+    import maya.cmds as cmds
+
+    temp_dir = tempfile.gettempdir()
+    layout_scene_path = os.path.join(temp_dir, "{}.mb".format(name))
+    cmds.file(rename=layout_scene_path)
+    cmds.file(save=True, type="mayaBinary")
+    return layout_scene_path
+
+
+"""
     import importlib
     from assemble import main
     importlib.reload(main)
@@ -86,6 +158,12 @@ def sourceFile(category, name, department, typed, version=None, approved=True):
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
     result = main.sourceFile("asset", "dobby", "rigging", "sourcefile")
+
+    from assemble import main
+    import importlib
+    importlib.reload(main)
+    main.PUBLISH_DCC = "maya"
+    result = main.assembleScene("shot", "shot-101", "rigging", "sourcefile", "asset1", "asset2", "asset3", "asset4")
     """
 
     # 1. Search for all versions in the specified context.

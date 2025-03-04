@@ -163,7 +163,7 @@ def getCurrentVersionFromDB(category, name, department, typed):
 
 
 
-def register(category, name, department, typed, software):
+def register(category, name, department, typed, software, comment="test publish"):
     current_version = getCurrentVersionFromDB(category, name, department, typed)
     next_version = utils.nextVersion(current_version)
 
@@ -178,7 +178,7 @@ def register(category, name, department, typed, software):
         "category_id": category_id,  # Asset or shot
         "department_id": department_id,  # modelling, rigging, etc
         "version": next_version,
-        "comment": "test publish",
+        "comment": comment,
         "project_id": project_id,
         "type": typed,
         "status": "Approved",

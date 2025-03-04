@@ -8,7 +8,11 @@ logging.basicConfig(level=logging.INFO)
 
 DOMAIN_CAT = ["asset", "shot"]
 
-ASSET_CAT = [["asset", ["modeling", "rigging"]], ["shot", ["layout", "animation"]]]
+ASSET_CAT = [["asset", ["modeling", "rigging", "lookdev"]], 
+             ["shot", ["layout", "animation", "lighting/Rendering", "Comp"]]]
+# Layout is primary stage of shot animation - setting up shot before camera; more of staging.
+# Final animation is done by anim dept
+
 # # Define the JSON file for DCC data
 dcc_data_filepath = os.path.expandvars("%CONFIG_PATH%/dcc.json")
 # Define the JSON file for artist db

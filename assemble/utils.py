@@ -59,8 +59,8 @@ def getVersion(PUBLISH_DCC, category, name, department, typed, v=None, approved=
 
     versions = db.query("versions", "*", conditions)
 
-    print("Printing all available verions:\n")
-    pprint(versions)
+    # print("Printing all available verions:\n")
+    # pprint(versions)
     
     if versions:
         return versions[-1]  # Return the latest version for the filtered combination
@@ -102,7 +102,14 @@ def getFilepath(version):
     if "software" not in version or version["software"] == 'blender':
         extension = ".blend"
     elif version["software"] == 'maya':
+        # Check for .ma extension first
         extension = ".ma"
-    
+        filepath = publish_utils.getVersionFilepath(category, name, department, project, typed, v, extension)
+        
+        # If the .ma file does not exist, check for .mb extension
+        if not os.path.exists(filepath):
+            extension = ".mb"
+            filepath = publish_utils.getVersionFilepath(category, name, department, project, typed, v, extension)
+        
     # Assuming publish_utils.getVersionFilepath can handle IDs instead of names
-    return publish_utils.getVersionFilepath(category, name, department, project, typed, v, extension)
+    return filepath

@@ -45,10 +45,13 @@ def dcc_context(category, name, department, PUBLISH_DCC, typed="sourcefile"):
         elif typed=="mp4File":
             return maya_scene.maya_motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None) 
         elif typed=="movFile":
-            return maya_scene.maya_motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)
+            return maya_scene.maya_motion_export("FFMPEG", "QUICKTIME", 1001, 1020, 24, filepath=None)
+        # Add optional argument for frame ranges. Eg: startframe=1001, endframe=1020
+        # New task: Assemble scene, version management, publish
+        # Layout scene assembly - publish assets (.mb file), reference assets, bring into layout scene
 
 
-def sourceFile(category, name, department, typed):
+def sourceFile(category, name, department, typed, comments):
     """
     import importlib
     from publish import main
@@ -87,6 +90,7 @@ def sourceFile(category, name, department, typed):
             department,
             typed,
             PUBLISH_DCC,
+            comments,
         )
 
     logging.info("2: Successfully registered in our data base, {} {} {}".format(
@@ -108,7 +112,6 @@ def sourceFile(category, name, department, typed):
         register_result["version"],
         extension,
     )
-    print("target_filepath: ", target_filepath)
     
     broadcast.deployed(
         source_filpath,

@@ -293,6 +293,7 @@ class CreateDomainWidget(QtWidgets.QWidget):
         # Add categories to the combobox
         for category in categories:
             self.combobox_category.addItem(category['name'])
+        return categories
     
     def populateDepartments(self):
         departments = broadcast.getAllDepartments()
@@ -300,6 +301,8 @@ class CreateDomainWidget(QtWidgets.QWidget):
         # Add departments to the combobox
         for department in departments:
             self.combobox_department.addItem(department['name'])
+        
+        return departments
     
     def populateProjects(self):
         projects = broadcast.getAllProjects()
