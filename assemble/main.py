@@ -22,7 +22,7 @@ def search(PUBLISH_DCC, category, name, department, typed, version=None, approve
     return utils.getVersion(PUBLISH_DCC, category, name, department, typed, version, approved)
 
 
-def sourceFile(category, name, department, typed, version=None, approved=True):
+def sourceFile(category, name, department, typed, comments="Test Publish", version=None, approved=True):
     """
         latest approved or latest or specific version can be able to load in downstrem deparatment  to begin their work
 
@@ -81,7 +81,7 @@ def load_maya_file(category, name, department, typed, version, approved):
         logging.info("3. Successfully opened %s version in Maya", searched_version["version"])
 
 
-def assembleScene(category, name, department, typed, *assets):
+def assembleScene(start_frame, end_frame, category, name, department, typed, *assets):
     """
     Assemble a scene in Maya with the specified assets as references.
     """
@@ -101,10 +101,22 @@ def assembleScene(category, name, department, typed, *assets):
 
     logging.info("4. End for loop for assembling the scene with all assets")
 
+    # Set frame ranges
+    set_frame_ranges(start_frame, end_frame)
+
     layout_scene_path = save_layout_scene(name)
     logging.info("5. Successfully saved the layout scene to %s", layout_scene_path)
 
     return layout_scene_path
+
+def set_frame_ranges(start_frame, end_frame):
+    """
+    Set the start and end frames in the Maya scene.
+    """
+    import maya.cmds as cmds
+    cmds.playbackOptions(min=start_frame, max=end_frame)
+    cmds.currentTime(start_frame)
+    logging.info("Set frame range: start_frame=%d, end_frame=%d", start_frame, end_frame)
 
 def get_asset_version_path(asset, department, typed):
     """

@@ -8,8 +8,8 @@ logging.basicConfig(level=logging.INFO)
 
 DOMAIN_CAT = ["asset", "shot"]
 
-ASSET_CAT = [["asset", ["modeling", "rigging", "lookdev"]], 
-             ["shot", ["layout", "animation", "lighting/Rendering", "Comp"]]]
+ASSET_CAT = [["asset", ["modeling", "rigging", "lookdev", "grooming"]], 
+             ["shot", ["layout", "animation", "FX", "lighting/Rendering", "Comp"]]]
 # Layout is primary stage of shot animation - setting up shot before camera; more of staging.
 # Final animation is done by anim dept
 
