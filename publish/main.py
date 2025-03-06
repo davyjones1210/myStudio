@@ -93,9 +93,6 @@ def deploy_target_filepath(source_filpath, category, name, department, typed, re
     extension = utils.fileExtension(source_filpath)
     project = utils.getProjectName()
     fileName = utils.getBaseFileName(source_filpath)
-    
-    print("register_result: {}".format(register_result))
-    print("register_result type: {}".format(type(register_result)))
 
     target_filepath = utils.getVersionFilepath(
         category,
@@ -114,10 +111,12 @@ def deploy_target_filepath(source_filpath, category, name, department, typed, re
     )
 
     logging.info(
-        "3: Successfully deployed version called {}, file path is {}".format(
+        "3: Successfully deployed version called: {}, target file path: {}".format(
             register_result["version"], target_filepath
         )
     )
+
+    return target_filepath
 
 def sourceFile(frame_start, frame_end, category, name, department, typed, comments):
     """
@@ -159,7 +158,7 @@ def sourceImages(category, name, department, typed, comments):
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
     result = main.sourceImages("asset", "alien", "texture", "sourceimages", "test comment")
-    print("Texture file paths: {}".format(result))
+    print("Target file paths: {}".format(result))
 
     Publish the source images for the given category, name, and department.
     """
@@ -185,10 +184,44 @@ def sourceImages(category, name, department, typed, comments):
         check_source_filepath(texture_filepath)
 
         # Deploy the file for distribution
-        deploy_target_filepath(texture_filepath, category, name, department, typed, register_result)
+        target_filepath = deploy_target_filepath(texture_filepath, category, name, department, typed, register_result)
 
-    return texture_filepaths
+    return target_filepath
 
+
+def textureSourceFile(category, name, department, typed, comments):
+    """
+    from publish import main
+    import importlib
+    importlib.reload(main)
+    main.PUBLISH_DCC = "maya"
+    result = main.textureSourceFile("asset", "alien", "texture", "sourcefile", "test comment")
+
+    Publish the source file for the given category, name, and department.
+    """
+
+    print("\n\n")
+    # Publish sourceImages to latest vesioned up location
+    sourceImages_filepath = sourceImages(category, name, department, "sourceimages", comments)
+    # sourceImages_filepath = "C:/works/projects/NewTestProj2/asset/alien/texture/sourceimages/v14/skin_color.png"
+
+
+    logging.info("1: Successfully published sourceimages to, {}".format(sourceImages_filepath))
+    # Reconnecting existing sourcefile with latest version of sourceimages
+    from publish import maya_scene
+    importlib.reload(maya_scene)
+    logging.info("2: Reconnect the existing source file with the latest version of source images.")
+    maya_scene.reconnect_source_with_images(sourceImages_filepath)
+
+    # Publish the texture sourcefile with the reconnected source images in the database
+    sourceFile(0,0, category, name, department, typed, comments)
+
+
+
+
+
+
+    return None
 
 
 

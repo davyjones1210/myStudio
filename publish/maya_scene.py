@@ -8,6 +8,7 @@ def maya_source():
     Execute the publish process
     """
     source_filpath = cmds.file(query=True, sceneName=True)
+    print("source_filpath: ", source_filpath)
 
     if not source_filpath:
         raise Exception("Error: Maya scene has not been saved. Please save the scene before publishing.")
@@ -231,6 +232,36 @@ def gather_texture_nodes():
         print(node, sourcefile)
         
     return texture_filepaths
+
+def reconnect_source_with_images(sourceImages_filepaths):
+    """
+    Reconnect the existing source file with the latest version of source images.
+    """
+    # Ensure sourceImages_filepaths is a list
+    if isinstance(sourceImages_filepaths, str):
+        sourceImages_filepaths = [sourceImages_filepaths]
+
+    # Iterate over the texture file paths and reconnect them
+    for texture_filepath in sourceImages_filepaths:
+        # Get the base file name without the extension
+        baseFileName = utils.getBaseFileName(texture_filepath)
+
+        # Find the corresponding file node in Maya
+        file_nodes = cmds.ls(type="file")
+
+        if not file_nodes:
+            raise Exception("Error: No file nodes found in the scene")
+        for node in file_nodes:
+            file_texture_name = cmds.getAttr(f"{node}.fileTextureName")
+
+            if baseFileName in file_texture_name:
+                # Reconnect the file node with the new texture file path
+                cmds.setAttr(f"{node}.fileTextureName", texture_filepath, type="string")
+                print(f"Reconnected {node} with {texture_filepath}")
+    
+    # Save the changes to the scene
+    cmds.file(save=True)
+    print("Scene saved successfully with the reconnected texture file paths.")
 
 
 # def movie(category, name, department):

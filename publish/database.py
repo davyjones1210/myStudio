@@ -61,11 +61,9 @@ class myDatabase(object):
             id = self.getLatestID(table)
             next_id = id + 1
             sql = f'INSERT INTO {table} (id, {keys}) VALUES (%s, {values})'
-            print("Printing sql execute command sent: ", sql, (next_id, *data.values()))
             cursor.execute(sql, (next_id, *data.values()))
         else:
             sql = f'INSERT INTO {table} ({keys}) VALUES ({values})'
-            print("Printing sql execute command sent: ", sql, tuple(data.values()))
             cursor.execute(sql, tuple(data.values()))
 
         self.conn.commit()

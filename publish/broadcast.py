@@ -108,7 +108,6 @@ def checkIfProjectExistsInDB(project_name):
 def _register_(table, data):
     myda = database.myDatabase()
     myda.connect()
-    print("Data passed to database: ", data)
     myda.insert(table, data)
     # Print regisering done
 

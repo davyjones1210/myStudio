@@ -80,17 +80,18 @@ def getBaseFileName(filepath):
     return baseFileName
 
 
-def getVersionFilepath(category, name, department, project, typed, version, extension, fileName):
+def getVersionFilepath(category, name, department, project, typed, version, extension, fileName=None):
  
     department_path = departmentPath(category, name, department, project)
+    if typed != "sourceimages":
+        fileName = name
 
     filepath = os.path.join(
         department_path,
         typed,
         version,
         "{}{}".format(fileName, extension),
-    )  
-    print("Target version file path: ", filepath)
+    )
     
     return filepath
 
@@ -98,25 +99,10 @@ def getCurrentVersion(category, name, department, typed):
     """
     Get the current version of a file for a specific combination of category, name, department, and typed.
     If no current version exists, return None.
-    Get the current version of a file for a specific combination of category, name, department, and typed.
-    If no current version exists, return None.
     """
-    version_file = os.path.expandvars("%DATABASE_PATH%/versions.json")
     version_file = os.path.expandvars("%DATABASE_PATH%/versions.json")
     if os.path.exists(version_file):
         versions = readJsonFile(version_file)
-        # Filter versions based on category, name, department, project and typed
-        filtered_versions = [
-            version for version in versions
-            if version["category"] == category and
-               version["name"] == name and
-               version["department"] == department and
-               version["project"] == getProjectName() and
-               version["type"] == typed
-        ]
-        
-        if filtered_versions:
-            return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
         # Filter versions based on category, name, department, project and typed
         filtered_versions = [
             version for version in versions
