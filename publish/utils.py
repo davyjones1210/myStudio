@@ -56,10 +56,9 @@ def departmentPath(category, name, department, project):
     return  os.path.abspath(os.path.join(getProjectPath(project), category, name, department))
 
 
-def fileExtension(filepath):
-    
-    
+def fileExtension(filepath):   
     dirname, extension = os.path.splitext(filepath)
+    
     return extension
      
 
@@ -72,8 +71,16 @@ def getTempFilepath(extension):
     temp_file.close()
     return temp_file.name
 
+def getBaseFileName(filepath):
+    """
+    Get the file name from the file path.
+    """
+    base_name = os.path.basename(filepath)
+    baseFileName, _ = os.path.splitext(base_name)
+    return baseFileName
 
-def getVersionFilepath(category, name, department, project, typed, version, extension):
+
+def getVersionFilepath(category, name, department, project, typed, version, extension, fileName):
  
     department_path = departmentPath(category, name, department, project)
 
@@ -81,8 +88,9 @@ def getVersionFilepath(category, name, department, project, typed, version, exte
         department_path,
         typed,
         version,
-        "{}{}".format(name, extension),
+        "{}{}".format(fileName, extension),
     )  
+    print("Target version file path: ", filepath)
     
     return filepath
 

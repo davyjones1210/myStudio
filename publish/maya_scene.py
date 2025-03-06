@@ -209,27 +209,51 @@ def convert_mov_to_mp4(mov_filepath, mp4_filepath):
         print("Failed to convert MOV to MP4: {}".format(e))
         raise
 
-def movie(category, name, department):
+def gather_texture_nodes():
     """
-    Execute the publish process
+    Gather all texture nodes in the current Maya scene.
     """
-    path = utils.departmentPath(category, name, department)
+        # Gather all texture nodes
+    texture_nodes = cmds.ls(type="file")
+    if not texture_nodes:
+        raise Exception("Error: No texture nodes found in the scene")
 
-    # path = %PROJECT_PATH%test1/asset/human/modeling
-    # path = %PROJECT_PATH%test1/shot/shot1/modeling
+    # Get the original file paths of the texture nodes
+    texture_filepaths = []
+    for node in texture_nodes:
+        file_path = cmds.getAttr(f"{node}.fileTextureName")
+        texture_filepaths.append(file_path)
+
+    print("Successfully gathered texture file paths")
+
+    for node in texture_nodes:
+        sourcefile = cmds.getAttr("{}.fileTextureName".format(node))
+        print(node, sourcefile)
+        
+    return texture_filepaths
+
+
+# def movie(category, name, department):
+#     """
+#     Execute the publish process
+#     """
+#     path = utils.departmentPath(category, name, department)
+
+#     # path = %PROJECT_PATH%test1/asset/human/modeling
+#     # path = %PROJECT_PATH%test1/shot/shot1/modeling
 
     
 
-    print(path)
+#     print(path)
 
-    # To extact the move file
+#     # To extact the move file
 
-    return "/temp/human.mov", True
+#     return "/temp/human.mov", True
 
 
-def register_version(category, name, department):
+# def register_version(category, name, department):
 
-    # Find the latest version input args
+#     # Find the latest version input args
 
-    # To add new entry in the database with new version
-    pass
+#     # To add new entry in the database with new version
+#     pass

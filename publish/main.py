@@ -60,6 +60,64 @@ def dcc_context(frame_start, frame_end, category, name, department, PUBLISH_DCC,
         # New task: Assemble scene, version management, publish
         # Layout scene assembly - publish assets (.mb file), reference assets, bring into layout scene
 
+def check_source_filepath(source_filpath):
+    """
+    Check if the source file path is set properly.
+    """
+    if not source_filpath:
+        raise Exception("Error: source file path could not be determined")
+    logging.info("1: Successfully extracted current source file, {}".format(source_filpath))
+
+def register_version(category, name, department, typed, PUBLISH_DCC, comments):
+    """
+    Register the publish in the database.
+    """
+    register_result = broadcast.register(
+        category,
+        name,
+        department,
+        typed,
+        PUBLISH_DCC,
+        comments,
+    )
+    logging.info("2: Successfully registered in our data base, {} {} {} {}".format(
+        name, department, register_result["version"], typed
+    ))
+
+    return register_result
+
+def deploy_target_filepath(source_filpath, category, name, department, typed, register_result):
+    """
+    Deploy the file for distribution.
+    """
+    extension = utils.fileExtension(source_filpath)
+    project = utils.getProjectName()
+    fileName = utils.getBaseFileName(source_filpath)
+    
+    print("register_result: {}".format(register_result))
+    print("register_result type: {}".format(type(register_result)))
+
+    target_filepath = utils.getVersionFilepath(
+        category,
+        name,
+        department,
+        project,
+        typed,
+        register_result["version"],
+        extension,
+        fileName,
+    )
+
+    broadcast.deployed(
+        source_filpath,
+        target_filepath,
+    )
+
+    logging.info(
+        "3: Successfully deployed version called {}, file path is {}".format(
+            register_result["version"], target_filepath
+        )
+    )
 
 def sourceFile(frame_start, frame_end, category, name, department, typed, comments):
     """
@@ -84,57 +142,54 @@ def sourceFile(frame_start, frame_end, category, name, department, typed, commen
     source_filpath = dcc_context(frame_start, frame_end, category, name, department,PUBLISH_DCC, typed)
 
     # Check if source_filpath is set properly
-    if not source_filpath:
-        raise Exception("Error: source file path could not be determined")
-
-    
-    logging.info("1: Successfully extracted current source file, {}".format(source_filpath))
-
-    # registertation
-    # adds entry in the database of this particular publish. A way to track the file.
-    # Types of source files: sourcefile, usd, dailies, movs, etc. This helps identify what kind of publish it is.
+    check_source_filepath(source_filpath)
 
     # Register the publish in the database
-
-    register_result = broadcast.register(
-            category,
-            name,
-            department,
-            typed,
-            PUBLISH_DCC,
-            comments,
-        )
-
-    logging.info("2: Successfully registered in our data base, {} {} {}".format(
-            name, department, register_result["version"], typed
-        )
-    )
-
-    # Deployed
-    # Means ready for distribution of the file to be saved somewhere in the project directory for use downstream.
-    extension = utils.fileExtension(source_filpath)
-    project = utils.getProjectName()
-
-    target_filepath = utils.getVersionFilepath(
-        category,
-        name,
-        department,
-        project,
-        typed,
-        register_result["version"],
-        extension,
-    )
+    register_result = register_version(category, name, department, typed, PUBLISH_DCC, comments)
     
-    broadcast.deployed(
-        source_filpath,
-        target_filepath,
-    )
 
-    logging.info(
-        "3: Successfully deployed version called {}, file path is {}".format(
-            register_result["version"], target_filepath
-        )
-    )
+    # Deploy the file for distribution
+    deploy_target_filepath(source_filpath, category, name, department, typed, register_result)
+
+
+def sourceImages(category, name, department, typed, comments):
+    """
+    from publish import main
+    import importlib
+    importlib.reload(main)
+    main.PUBLISH_DCC = "maya"
+    result = main.sourceImages("asset", "alien", "texture", "sourceimages", "test comment")
+    print("Texture file paths: {}".format(result))
+
+    Publish the source images for the given category, name, and department.
+    """
+    logging.info("Begins source images publish")
+
+
+    # Ensure the current DCC software is set to Maya
+    if PUBLISH_DCC != "maya":
+        raise Exception("Error: Current publish software is not set to Maya")
+    
+    from publish import maya_scene
+    importlib.reload(maya_scene)
+
+    # Gather texture nodes and get their file paths
+    texture_filepaths = maya_scene.gather_texture_nodes()
+
+    # Register the publish in the database
+    register_result = register_version(category, name, department, typed, PUBLISH_DCC, comments)
+
+    # Deploy each texture file for distribution
+    for texture_filepath in texture_filepaths:
+        # Check if texture_filepath is set properly
+        check_source_filepath(texture_filepath)
+
+        # Deploy the file for distribution
+        deploy_target_filepath(texture_filepath, category, name, department, typed, register_result)
+
+    return texture_filepaths
+
+
 
 
 # This is for source file publish. Create a new function for USD and Alembic publish
