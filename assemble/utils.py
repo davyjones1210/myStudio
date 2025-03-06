@@ -42,6 +42,7 @@ def getVersion(PUBLISH_DCC, category, name, department, typed, v=None, approved=
     Get the latest version of a file for a specific combination of category, name, department, and typed.
     If no current version exists, return None.
     """
+    
     db = database.myDatabase()
     conditions = (
         f"category_id = (SELECT id FROM category WHERE LOWER(name) = LOWER('{category}')) AND "
@@ -51,12 +52,13 @@ def getVersion(PUBLISH_DCC, category, name, department, typed, v=None, approved=
         f"type = '{typed}'"
     )
     if v is not None:
-        conditions += f" AND version = {v}"
+        conditions += f" AND version = '{v}'"
     if approved:
         conditions += " AND (status = 'Approved' OR status IS NULL)"
     if PUBLISH_DCC:
         conditions += f" AND (software IS NULL OR software = '{PUBLISH_DCC}')"
 
+    
     versions = db.query("versions", "*", conditions)
 
     # print("Printing all available verions:\n")

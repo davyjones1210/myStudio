@@ -22,7 +22,7 @@ def search(PUBLISH_DCC, category, name, department, typed, version=None, approve
     return utils.getVersion(PUBLISH_DCC, category, name, department, typed, version, approved)
 
 
-def sourceFile(category, name, department, typed, comments="Test Publish", version=None, approved=True):
+def sourceFile(category, name, department, typed, version=None, approved=True):
     """
         latest approved or latest or specific version can be able to load in downstrem deparatment  to begin their work
 
@@ -175,7 +175,7 @@ def save_layout_scene(name):
     import importlib
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
-    result = main.assembleScene("shot", "shot-101", "rigging", "sourcefile", "asset1", "asset2", "asset3", "asset4")
+    result = main.assembleScene(1001, 1020, "shot", "shot-101", "rigging", "sourcefile", "main_cam", "alien", "pyramid", "dobby")
     """
 
     # 1. Search for all versions in the specified context.

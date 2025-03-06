@@ -3,50 +3,53 @@ import importlib
 from publish import utils
 from publish import broadcast
 
-import importlib
+# Reload modules to ensure the latest changes are loaded
 importlib.reload(broadcast)
 importlib.reload(utils)
 
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 
+# Global variable to store the current DCC software
 PUBLISH_DCC = None
 
 
 def dcc_context(frame_start, frame_end, category, name, department, PUBLISH_DCC, typed="sourcefile"):
+    """
+    Determine the context for the DCC software and execute the appropriate export function.
+    """
     if not PUBLISH_DCC:
-        raise Exception("Error could not set current publish software")
+        raise Exception("Error: Could not set current publish software")
 
     logging.info("Begins source file publish")
 
-    # Get Source File
     try:
-
         if PUBLISH_DCC == "blender":
             from publish import blender_scene
             importlib.reload(blender_scene)
-            if typed=="sourcefile":
+            if typed == "sourcefile":
                 return blender_scene.source()
-            elif typed=="usdFile":
+            elif typed == "usdFile":
                 return blender_scene.usd_export(False, False, True, False, filepath=None)
-            elif typed=="alembicFile":
+            elif typed == "alembicFile":
                 return blender_scene.alembic_export(False, True, True, True, filepath=None)
-            elif typed=="mp4File":
+            elif typed == "mp4File":
                 return blender_scene.motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None)
-            elif typed=="movFile":
-                return blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None) 
+            elif typed == "movFile":
+                return blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)
 
         if PUBLISH_DCC == "maya":
             from publish import maya_scene
             importlib.reload(maya_scene)
-            if typed=="sourcefile":
+            if typed == "sourcefile":
                 return maya_scene.maya_source()
-            elif typed=="usdFile":
+            elif typed == "usdFile":
                 return maya_scene.maya_usd_export(frame_start, frame_end, False, True, True, False, filepath=None)
-            elif typed=="alembicFile":
+            elif typed == "alembicFile":
                 return maya_scene.maya_alembic_export(frame_start, frame_end, False, True, filepath=None)
-            elif typed=="mp4File":
-                return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "MPEG4",24, filepath=None) 
-            elif typed=="movFile":
+            elif typed == "mp4File":
+                return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "MPEG4", 24, filepath=None)
+            elif typed == "movFile":
                 return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "QUICKTIME", 24, filepath=None)
     except Exception as e:
         logging.error("Error during DCC context operation: %s", str(e))
@@ -72,6 +75,8 @@ def sourceFile(frame_start, frame_end, category, name, department, typed, commen
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
     result = main.sourceFile(1001, 1020, "shot", "shot-101", "layout", "sourcefile", "test comment")
+
+    Publish the source file for the given category, name, and department.
     """
 
     print("\n\n")
@@ -89,8 +94,8 @@ def sourceFile(frame_start, frame_end, category, name, department, typed, commen
     # adds entry in the database of this particular publish. A way to track the file.
     # Types of source files: sourcefile, usd, dailies, movs, etc. This helps identify what kind of publish it is.
 
-    #     
-    
+    # Register the publish in the database
+
     register_result = broadcast.register(
             category,
             name,
