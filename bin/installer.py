@@ -59,6 +59,13 @@ def execute():
         os.environ["MY_BIN"] = path_name
         # print(os.environ["PATH"])
 
+        # Add FFMPEG path to the PATH environment variable
+        ffmpeg_path = "C:\\ffmpeg\\ffmpeg-7.1-essentials_build\\bin"
+        os.environ["PATH"] = "%s;%s" % (os.environ["PATH"], ffmpeg_path)
+
+        # Print the updated PATH for verification
+        print("Updated PATH: {}".format(os.environ["PATH"]))
+
         mystudio_path = os.path.join(PIPELINE_DIRECTORY, "sourcecodes/myStudio")
         os.environ["SOURCE_CODE_PATH"] = mystudio_path
 

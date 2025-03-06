@@ -12,46 +12,53 @@ logging.basicConfig(level=logging.INFO)
 PUBLISH_DCC = None
 
 
-def dcc_context(category, name, department, PUBLISH_DCC, typed="sourcefile"):
+def dcc_context(frame_start, frame_end, category, name, department, PUBLISH_DCC, typed="sourcefile"):
     if not PUBLISH_DCC:
         raise Exception("Error could not set current publish software")
 
     logging.info("Begins source file publish")
 
     # Get Source File
-    if PUBLISH_DCC == "blender":
-        from publish import blender_scene
-        importlib.reload(blender_scene)
-        if typed=="sourcefile":
-            return blender_scene.source()
-        elif typed=="usdFile":
-            return blender_scene.usd_export(False, False, True, False, filepath=None)
-        elif typed=="alembicFile":
-            return blender_scene.alembic_export(False, True, True, True, filepath=None)
-        elif typed=="mp4File":
-            return blender_scene.motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None)
-        elif typed=="movFile":
-            return blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None) 
+    try:
 
-    if PUBLISH_DCC == "maya":
-        from publish import maya_scene
-        importlib.reload(maya_scene)
-        if typed=="sourcefile":
-            return maya_scene.maya_source()
-        elif typed=="usdFile":
-            return maya_scene.maya_usd_export(False, False, True, False, filepath=None)
-        elif typed=="alembicFile":
-            return maya_scene.maya_alembic_export(False, True, 1, 5, filepath=None)
-        elif typed=="mp4File":
-            return maya_scene.maya_motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None) 
-        elif typed=="movFile":
-            return maya_scene.maya_motion_export("FFMPEG", "QUICKTIME", 1001, 1020, 24, filepath=None)
+        if PUBLISH_DCC == "blender":
+            from publish import blender_scene
+            importlib.reload(blender_scene)
+            if typed=="sourcefile":
+                return blender_scene.source()
+            elif typed=="usdFile":
+                return blender_scene.usd_export(False, False, True, False, filepath=None)
+            elif typed=="alembicFile":
+                return blender_scene.alembic_export(False, True, True, True, filepath=None)
+            elif typed=="mp4File":
+                return blender_scene.motion_export("FFMPEG", "MPEG4", 1, 5, 24, filepath=None)
+            elif typed=="movFile":
+                return blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None) 
+
+        if PUBLISH_DCC == "maya":
+            from publish import maya_scene
+            importlib.reload(maya_scene)
+            if typed=="sourcefile":
+                return maya_scene.maya_source()
+            elif typed=="usdFile":
+                return maya_scene.maya_usd_export(False, False, True, False, filepath=None)
+            elif typed=="alembicFile":
+                return maya_scene.maya_alembic_export(False, True, 1, 5, filepath=None)
+            elif typed=="mp4File":
+                return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "MPEG4",24, filepath=None) 
+            elif typed=="movFile":
+                return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "QUICKTIME", 24, filepath=None)
+    except Exception as e:
+        logging.error("Error during DCC context operation: %s", str(e))
+        raise
+
+    raise Exception("Error: Unsupported DCC software or invalid type")
         # Add optional argument for frame ranges. Eg: startframe=1001, endframe=1020
         # New task: Assemble scene, version management, publish
         # Layout scene assembly - publish assets (.mb file), reference assets, bring into layout scene
 
 
-def sourceFile(category, name, department, typed, comments):
+def sourceFile(frame_start, frame_end, category, name, department, typed, comments):
     """
     import importlib
     from publish import main
@@ -69,7 +76,7 @@ def sourceFile(category, name, department, typed, comments):
 
     print("\n\n")
 
-    source_filpath = dcc_context(category, name, department,PUBLISH_DCC, typed)
+    source_filpath = dcc_context(frame_start, frame_end, category, name, department,PUBLISH_DCC, typed)
 
     # Check if source_filpath is set properly
     if not source_filpath:

@@ -119,7 +119,7 @@ def maya_alembic_export(selected=False, animation=False, start_frame=1, end_fram
     return filepath
 
 
-def maya_motion_export(file_format, video_format, frame_start, frame_end, fps, filepath=None):
+def maya_motion_export(frame_start, frame_end, file_format, video_format, fps, filepath=None):
     """
     Export the current Maya scene to either QuickTime (.mov) format (with H.264 codec)
     or MP4 using a workaround (convert .mov to .mp4).
@@ -169,9 +169,40 @@ def maya_motion_export(file_format, video_format, frame_start, frame_end, fps, f
         print(f"MP4 export failed: {e}")
         return None
 
+    print("Executed the playblast command")
+
+    # If the video format is MPEG4, convert the MOV file to MP4
+    if video_format == "MPEG4":
+        mp4_filepath = filepath.replace(".mov", ".mp4")
+        convert_mov_to_mp4(filepath, mp4_filepath)
+        return mp4_filepath
+
     return filepath
 
+def convert_mov_to_mp4(mov_filepath, mp4_filepath):
+    """
+    Convert a MOV file to MP4 using FFMPEG.
+    """
+    import subprocess
 
+    command = [
+        "ffmpeg",
+        "-i", mov_filepath,
+        "-vcodec", "libx264",
+        "-acodec", "aac",
+        "-strict", "experimental",
+        mp4_filepath
+    ]
+
+    print("Converting MOV to MP4: {}".format(command))
+    try:
+        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("FFMPEG output: {}".format(result.stdout.decode()))
+        print("FFMPEG error (if any): {}".format(result.stderr.decode()))
+        print("Successfully converted MOV to MP4: {}".format(mp4_filepath))
+    except subprocess.CalledProcessError as e:
+        print("Failed to convert MOV to MP4: {}".format(e))
+        raise
 
 def movie(category, name, department):
     """
