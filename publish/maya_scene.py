@@ -14,7 +14,7 @@ def maya_source():
 
     return source_filpath
 
-def maya_usd_export(selected=False, animation=False, uvmaps=False, materials=False, filepath=None):
+def maya_usd_export(frame_start, frame_end, selected=False, animation=False, uvmaps=False, materials=False, filepath=None):
     """
     Export the current Maya scene to USD format.
     """
@@ -35,7 +35,7 @@ def maya_usd_export(selected=False, animation=False, uvmaps=False, materials=Fal
         "exportComponentTags": True,
         "defaultMeshScheme": "catmullClark",
         "eulerFilter": False,
-        "staticSingleSample": False,
+        "staticSingleSample": not animation,
         "frameStride": 1,
         "defaultUSDFormat": "usdc",
         "rootPrim": "",
@@ -67,18 +67,21 @@ def maya_usd_export(selected=False, animation=False, uvmaps=False, materials=Fal
     else:
         export_options["selection"] = False
 
+    # Handle animation export
+    if animation:
+        export_options["frameRange"] = (frame_start, frame_end)
+
     # Execute the export command
     try:
         cmds.mayaUSDExport(file=filepath, **export_options)
     except Exception as e:
-        print(f"USD export failed: {e}")
+        print("USD export failed: {}".format(e))
         return None
 
     print("USD export succeeded")
     return filepath
 
-
-def maya_alembic_export(selected=False, animation=False, start_frame=1, end_frame=1, filepath=None):
+def maya_alembic_export(frame_start, frame_end, selected=False, animation=True, filepath=None):
     """
     Export the current Maya scene to Alembic format.
     """
@@ -90,12 +93,14 @@ def maya_alembic_export(selected=False, animation=False, start_frame=1, end_fram
 
     # Set export options
     export_options = [
-        "-frameRange", str(start_frame), str(end_frame),
         "-uvWrite",
         "-worldSpace",
         "-writeVisibility",
         "-dataFormat", "ogawa"
     ]
+
+    if animation:
+        export_options.extend(["-frameRange", str(frame_start), str(frame_end)])
 
     if selected:
         selected_objects = cmds.ls(selection=True)
@@ -108,12 +113,12 @@ def maya_alembic_export(selected=False, animation=False, start_frame=1, end_fram
     # Construct the export command
     export_command = ' '.join(export_options) + ' -file "{}"'.format(filepath.replace("\\", "/"))
 
-    print(f"Export command: {export_command}")
+    print("Export command: {}".format(export_command))
     # Execute the export command
     try:
         cmds.AbcExport(j=export_command)
     except Exception as e:
-        print(f"Alembic export failed: {e}")
+        print("Alembic export failed: {}".format(e))
         return None
 
     return filepath

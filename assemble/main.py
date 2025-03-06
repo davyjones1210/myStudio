@@ -169,7 +169,7 @@ def save_layout_scene(name):
     import importlib
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
-    result = main.sourceFile("asset", "dobby", "rigging", "sourcefile")
+    result = main.sourceFile("shot", "shot-101", "layout", "sourcefile")
 
     from assemble import main
     import importlib

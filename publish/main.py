@@ -41,9 +41,9 @@ def dcc_context(frame_start, frame_end, category, name, department, PUBLISH_DCC,
             if typed=="sourcefile":
                 return maya_scene.maya_source()
             elif typed=="usdFile":
-                return maya_scene.maya_usd_export(False, False, True, False, filepath=None)
+                return maya_scene.maya_usd_export(frame_start, frame_end, False, True, True, False, filepath=None)
             elif typed=="alembicFile":
-                return maya_scene.maya_alembic_export(False, True, 1, 5, filepath=None)
+                return maya_scene.maya_alembic_export(frame_start, frame_end, False, True, filepath=None)
             elif typed=="mp4File":
                 return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "MPEG4",24, filepath=None) 
             elif typed=="movFile":
@@ -71,7 +71,7 @@ def sourceFile(frame_start, frame_end, category, name, department, typed, commen
     import importlib
     importlib.reload(main)
     main.PUBLISH_DCC = "maya"
-    result = main.sourceFile("asset", "dobby", "rigging", "sourcefile")
+    result = main.sourceFile(1001, 1020, "shot", "shot-101", "layout", "sourcefile", "test comment")
     """
 
     print("\n\n")
