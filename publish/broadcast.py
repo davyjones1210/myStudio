@@ -153,8 +153,8 @@ def getCurrentVersionFromDB(category, name, department, typed):
            version["type"].lower() == typed.lower()
     ]
 
-    print("List of available versions:")
-    pprint(filtered_versions)  # Use pprint to print the list neatly
+    # print("List of available versions:")
+    # pprint(filtered_versions)  # Use pprint to print the list neatly
 
     if filtered_versions:
         return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination

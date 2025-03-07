@@ -178,6 +178,8 @@ def sourceImages(category, name, department, typed, comments):
     # Register the publish in the database
     register_result = register_version(category, name, department, typed, PUBLISH_DCC, comments)
 
+
+    result = []
     # Deploy each texture file for distribution
     for texture_filepath in texture_filepaths:
         # Check if texture_filepath is set properly
@@ -186,7 +188,9 @@ def sourceImages(category, name, department, typed, comments):
         # Deploy the file for distribution
         target_filepath = deploy_target_filepath(texture_filepath, category, name, department, typed, register_result)
 
-    return target_filepath
+        result.append(target_filepath)
+
+    return result
 
 
 def textureSourceFile(category, name, department, typed, comments):
@@ -205,13 +209,13 @@ def textureSourceFile(category, name, department, typed, comments):
     sourceImages_filepath = sourceImages(category, name, department, "sourceimages", comments)
     # sourceImages_filepath = "C:/works/projects/NewTestProj2/asset/alien/texture/sourceimages/v14/skin_color.png"
 
-
     logging.info("1: Successfully published sourceimages to, {}".format(sourceImages_filepath))
     # Reconnecting existing sourcefile with latest version of sourceimages
     from publish import maya_scene
     importlib.reload(maya_scene)
     logging.info("2: Reconnect the existing source file with the latest version of source images.")
-    maya_scene.reconnect_source_with_images(sourceImages_filepath)
+    maya_scene.reconnect_source_with_images("..../v2", sourceImages_filepath)
+    # Make sure to replace root directory, and pass separate file name.
 
     # Publish the texture sourcefile with the reconnected source images in the database
     sourceFile(0,0, category, name, department, typed, comments)

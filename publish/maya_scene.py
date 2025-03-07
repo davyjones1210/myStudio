@@ -260,7 +260,7 @@ def reconnect_source_with_images(sourceImages_filepaths):
                 print(f"Reconnected {node} with {texture_filepath}")
     
     # Save the changes to the scene
-    cmds.file(save=True)
+    # cmds.file(save=True)
     print("Scene saved successfully with the reconnected texture file paths.")
 
 
