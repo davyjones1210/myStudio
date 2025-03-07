@@ -226,10 +226,6 @@ def gather_texture_nodes():
         texture_filepaths.append(file_path)
 
     print("Successfully gathered texture file paths")
-
-    for node in texture_nodes:
-        sourcefile = cmds.getAttr("{}.fileTextureName".format(node))
-        print(node, sourcefile)
         
     return texture_filepaths
 
@@ -237,6 +233,7 @@ def reconnect_source_with_images(sourceImages_filepaths):
     """
     Reconnect the existing source file with the latest version of source images.
     """
+
     # Ensure sourceImages_filepaths is a list
     if isinstance(sourceImages_filepaths, str):
         sourceImages_filepaths = [sourceImages_filepaths]
@@ -257,10 +254,10 @@ def reconnect_source_with_images(sourceImages_filepaths):
             if baseFileName in file_texture_name:
                 # Reconnect the file node with the new texture file path
                 cmds.setAttr(f"{node}.fileTextureName", texture_filepath, type="string")
-                print(f"Reconnected {node} with {texture_filepath}")
+                # Save the changes to the scene
+                cmds.file(save=True)
     
-    # Save the changes to the scene
-    # cmds.file(save=True)
+    
     print("Scene saved successfully with the reconnected texture file paths.")
 
 

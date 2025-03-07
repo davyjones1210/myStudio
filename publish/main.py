@@ -214,7 +214,7 @@ def textureSourceFile(category, name, department, typed, comments):
     from publish import maya_scene
     importlib.reload(maya_scene)
     logging.info("2: Reconnect the existing source file with the latest version of source images.")
-    maya_scene.reconnect_source_with_images("..../v2", sourceImages_filepath)
+    maya_scene.reconnect_source_with_images(sourceImages_filepath)
     # Make sure to replace root directory, and pass separate file name.
 
     # Publish the texture sourcefile with the reconnected source images in the database
