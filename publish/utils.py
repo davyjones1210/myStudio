@@ -9,25 +9,41 @@ logging.basicConfig(level=logging.INFO)
 def environmantValue(key):
     return os.environ[key]
 
-def readJsonFile(sourcefile):
-    with open(sourcefile, "r") as file:
-        data = json.load(file)
-    return data
+def initialize_json_file(json_file):
+    # Initialize the JSON database if it doesn't exist
+    if not os.path.exists(json_file):
+        with open(json_file, "w") as file:
+            json.dump([], file, indent=4)  # Empty list to store artist data
 
+def readJson(filepath):
+    # Reads the json filepath passed and returns the data
+    with open(filepath, 'r') as openfile:
+        return json.load(openfile)    
 
-def writeJson(data):
-
-    filepath = os.path.join(os.path.expandvars("%DATABASE_PATH%/versions.json"))
-    filepath = os.path.join(os.path.expandvars("%DATABASE_PATH%/versions.json"))
-    finalData = [data]
-
-    if os.path.exists(filepath):
-        with open(filepath, "r") as file:
-            finalData = json.load(file)  
-            finalData.append(data)
-
+def writeJson(filepath, data):
+    # Save updated domain database
     with open(filepath, "w") as file:
-        file.write(json.dumps(finalData, indent=4)) 
+        json.dump(data, file, indent=4)
+
+
+# def readJsonFile(sourcefile):
+#     with open(sourcefile, "r") as file:
+#         data = json.load(file)
+#     return data
+
+
+# def writeJson(data):
+
+#     filepath = os.path.join(os.path.expandvars("%DATABASE_PATH%/versions.json"))
+#     finalData = [data]
+
+#     if os.path.exists(filepath):
+#         with open(filepath, "r") as file:
+#             finalData = json.load(file)  
+#             finalData.append(data)
+
+#     with open(filepath, "w") as file:
+#         file.write(json.dumps(finalData, indent=4)) 
 
 
 
@@ -60,6 +76,13 @@ def fileExtension(filepath):
     dirname, extension = os.path.splitext(filepath)
     
     return extension
+
+def getFilePath(filepath):
+    """
+    Get the directory path of a file without the file name and extension.
+    """
+    directory_path = os.path.dirname(filepath)
+    return directory_path
      
 
 def getTempFilepath(extension):
@@ -95,27 +118,27 @@ def getVersionFilepath(category, name, department, project, typed, version, exte
     
     return filepath
 
-def getCurrentVersion(category, name, department, typed):
-    """
-    Get the current version of a file for a specific combination of category, name, department, and typed.
-    If no current version exists, return None.
-    """
-    version_file = os.path.expandvars("%DATABASE_PATH%/versions.json")
-    if os.path.exists(version_file):
-        versions = readJsonFile(version_file)
-        # Filter versions based on category, name, department, project and typed
-        filtered_versions = [
-            version for version in versions
-            if version["category"] == category and
-               version["name"] == name and
-               version["department"] == department and
-               version["project"] == getProjectName() and
-               version["type"] == typed
-        ]
+# def getCurrentVersion(category, name, department, typed):
+#     """
+#     Get the current version of a file for a specific combination of category, name, department, and typed.
+#     If no current version exists, return None.
+#     """
+#     version_file = os.path.expandvars("%DATABASE_PATH%/versions.json")
+#     if os.path.exists(version_file):
+#         versions = readJsonFile(version_file)
+#         # Filter versions based on category, name, department, project and typed
+#         filtered_versions = [
+#             version for version in versions
+#             if version["category"] == category and
+#                version["name"] == name and
+#                version["department"] == department and
+#                version["project"] == getProjectName() and
+#                version["type"] == typed
+#         ]
         
-        if filtered_versions:
-            return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
-    return None
+#         if filtered_versions:
+#             return filtered_versions[-1]["version"]  # Return the latest version for the filtered combination
+#     return None
 
 
 

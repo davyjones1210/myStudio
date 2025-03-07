@@ -1,6 +1,6 @@
 import maya.cmds as cmds
 from publish import utils
-
+import json
 
 
 def maya_source():
@@ -259,6 +259,52 @@ def reconnect_source_with_images(sourceImages_filepaths):
     
     
     print("Scene saved successfully with the reconnected texture file paths.")
+
+def export_shader_networks(filepath=None):
+    """
+    Export all shader networks in the Hypershade window to the target file path.
+    """
+    # Setting up temp file path for exporting shader network
+    filepath = filepath or utils.getTempFilepath(".mb")
+    print("Printing temp file path for shader network: ", filepath)
+    # Select all shading nodes
+    shading_nodes = cmds.ls(materials=True)
+    if not shading_nodes:
+        raise Exception("Error: No shading nodes found in the scene")
+
+    # Select all shading nodes
+    cmds.select(shading_nodes, replace=True)
+
+    # Export selected shading nodes to the target file path
+    cmds.file(filepath, exportSelected=True, type="mayaBinary", force=True)
+    print(f"Shader networks exported temporarily to {filepath}")
+    return filepath
+
+def export_shader_network_metadata(filepath=None):
+
+    # Initialize the json file to store the shader network metadata
+    
+    # Setting up temp file path for exporting shader network metadata
+    filepath = filepath or utils.getTempFilepath(".json")
+    print("Printing temp file path for json file: ", filepath)
+
+    utils.initialize_json_file(filepath)
+
+    # Gather all shading nodes in the scene   
+    shadingEngines = cmds.ls(type="shadingEngine")
+    print(shadingEngines)
+
+    result = []
+    for shadingEngine in shadingEngines:
+        shader = cmds.listConnections("{}.surfaceShader".format(shadingEngine), source=True, destination=False)
+        #cmds.listConnections("blinn1SG.surfaceShader", source=True, destination=False)
+        mesh = cmds.sets(shadingEngine, query=True)
+        content = {"shadingEngine": shadingEngine, "shader": shader[0], "mesh": mesh}
+        result.append(content)
+
+    # print(json.dumps(result, indent=4))
+    utils.writeJson(filepath, result)
+    return filepath
 
 
 # def movie(category, name, department):

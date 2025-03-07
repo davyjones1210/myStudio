@@ -2,6 +2,8 @@ import logging
 import importlib
 from publish import utils
 from publish import broadcast
+from publish import maya_scene
+importlib.reload(maya_scene)
 
 # Reload modules to ensure the latest changes are loaded
 importlib.reload(broadcast)
@@ -38,9 +40,11 @@ def dcc_context(frame_start, frame_end, category, name, department, PUBLISH_DCC,
             elif typed == "movFile":
                 return blender_scene.motion_export("FFMPEG", "QUICKTIME", 1, 5, 24, filepath=None)
 
-        if PUBLISH_DCC == "maya":
-            from publish import maya_scene
-            importlib.reload(maya_scene)
+        if PUBLISH_DCC == "maya":            
+            if typed == "metadata":
+                return maya_scene.export_shader_network_metadata()
+            if typed == "shaderfile":
+                return maya_scene.export_shader_networks()
             if typed == "sourcefile":
                 return maya_scene.maya_source()
             elif typed == "usdFile":
@@ -148,7 +152,9 @@ def sourceFile(frame_start, frame_end, category, name, department, typed, commen
     
 
     # Deploy the file for distribution
-    deploy_target_filepath(source_filpath, category, name, department, typed, register_result)
+    target_path = deploy_target_filepath(source_filpath, category, name, department, typed, register_result)
+
+    return target_path
 
 
 def sourceImages(category, name, department, typed, comments):
@@ -168,9 +174,6 @@ def sourceImages(category, name, department, typed, comments):
     # Ensure the current DCC software is set to Maya
     if PUBLISH_DCC != "maya":
         raise Exception("Error: Current publish software is not set to Maya")
-    
-    from publish import maya_scene
-    importlib.reload(maya_scene)
 
     # Gather texture nodes and get their file paths
     texture_filepaths = maya_scene.gather_texture_nodes()
@@ -211,8 +214,7 @@ def textureSourceFile(category, name, department, typed, comments):
 
     logging.info("1: Successfully published sourceimages to, {}".format(sourceImages_filepath))
     # Reconnecting existing sourcefile with latest version of sourceimages
-    from publish import maya_scene
-    importlib.reload(maya_scene)
+    
     logging.info("2: Reconnect the existing source file with the latest version of source images.")
     maya_scene.reconnect_source_with_images(sourceImages_filepath)
     # Make sure to replace root directory, and pass separate file name.
@@ -220,12 +222,40 @@ def textureSourceFile(category, name, department, typed, comments):
     # Publish the texture sourcefile with the reconnected source images in the database
     sourceFile(0,0, category, name, department, typed, comments)
 
-
-
-
-
-
     return None
+
+
+def lookdevSourceFile(category, name, department, typed, comments):
+    """
+    from publish import main
+    import importlib
+    importlib.reload(main)
+    main.PUBLISH_DCC = "maya"
+    result = main.lookdevSourceFile("asset", "dobby", "lookdev", "shaderfile", "test comment")
+
+    Publish the lookdev shaderfile for the given category, name, and department.
+    """
+    
+    print("\n\n")
+    logging.info("Begins lookdev publish")
+    # Publish shader network from hypershade window to a file
+    sourceFile(0,0, category, name, department, typed, comments)
+
+    logging.info("1: published shader network from hypershade window to target filepath.")
+    
+
+    # Publish meta data in json file to a file
+    sourceFile(0,0, category, name, department, "metadata", comments)
+
+    logging.info("2: published shader network meta data to json file at target filepath.")
+
+    # Publish the lookdev sourcefile like before
+    sourceFile(0,0, category, name, department, "sourcefile", comments)
+    logging.info("3: published lookdev sourcefile to target filepath.")
+
+
+
+
 
 
 
