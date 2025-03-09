@@ -1,3 +1,4 @@
+import os
 import maya.cmds as cmds
 from publish import utils
 import json
@@ -123,6 +124,65 @@ def maya_alembic_export(frame_start, frame_end, selected=False, animation=True, 
         return None
 
     return filepath
+
+
+def maya_alembic_export_per_asset(frame_start, frame_end, selected=False, animation=True, directory=None):
+    """
+    Export the Alembic file of each asset in the Maya scene.
+    """
+    if directory is None:
+        directory = utils.getTempDirectory()
+
+    # Ensure the directory exists
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    alembic_filepaths = []
+
+    # Ensure the AbcExport plugin is loaded
+    if not cmds.pluginInfo('AbcExport', query=True, loaded=True):
+        cmds.loadPlugin('AbcExport')
+
+    # Identify the names of the assets in the scene, excluding default cameras
+    assets = [asset for asset in cmds.ls(assemblies=True) if asset not in ["persp", "top", "front", "side"]]
+
+    for asset in assets:
+        # Select the asset
+        cmds.select(asset, hierarchy=True, replace=True)
+
+        # Remove namespaces from the asset name and use the first part before the ':'
+        asset_name = asset.split(":")[0]
+
+        # Set the file path for the Alembic export
+        alembic_filepath = "{}/{}.abc".format(directory, asset_name)
+        alembic_filepath = alembic_filepath.replace("\\", "/")
+
+        # Set export options
+        export_options = [
+            "-uvWrite",
+            "-worldSpace",
+            "-writeVisibility",
+            "-dataFormat", "ogawa",
+            "-writeUVSets",
+            "-worldSpace",
+            "-root", asset
+        ]
+
+        if animation:
+            export_options.extend(["-frameRange", str(frame_start), str(frame_end)])
+
+        # Construct the export command
+        export_command = ' '.join(export_options) + ' -file "{}"'.format(alembic_filepath)
+
+        print("Export command for {}: {}".format(asset, export_command))
+        # Execute the export command
+        try:
+            cmds.AbcExport(j=export_command)
+            alembic_filepaths.append(alembic_filepath)
+        except Exception as e:
+            print("Alembic export failed for {}: {}".format(asset, e))
+
+    return alembic_filepaths
 
 
 def maya_motion_export(frame_start, frame_end, file_format, video_format, fps, filepath=None):
@@ -266,7 +326,6 @@ def export_shader_networks(filepath=None):
     """
     # Setting up temp file path for exporting shader network
     filepath = filepath or utils.getTempFilepath(".mb")
-    print("Printing temp file path for shader network: ", filepath)
     # Select all shading nodes
     shading_nodes = cmds.ls(materials=True)
     if not shading_nodes:
@@ -277,7 +336,6 @@ def export_shader_networks(filepath=None):
 
     # Export selected shading nodes to the target file path
     cmds.file(filepath, exportSelected=True, type="mayaBinary", force=True)
-    print(f"Shader networks exported temporarily to {filepath}")
     return filepath
 
 def export_shader_network_metadata(filepath=None):
@@ -286,13 +344,11 @@ def export_shader_network_metadata(filepath=None):
     
     # Setting up temp file path for exporting shader network metadata
     filepath = filepath or utils.getTempFilepath(".json")
-    print("Printing temp file path for json file: ", filepath)
 
     utils.initialize_json_file(filepath)
 
     # Gather all shading nodes in the scene   
     shadingEngines = cmds.ls(type="shadingEngine")
-    print(shadingEngines)
 
     result = []
     for shadingEngine in shadingEngines:
@@ -302,32 +358,5 @@ def export_shader_network_metadata(filepath=None):
         content = {"shadingEngine": shadingEngine, "shader": shader[0], "mesh": mesh}
         result.append(content)
 
-    # print(json.dumps(result, indent=4))
     utils.writeJson(filepath, result)
     return filepath
-
-
-# def movie(category, name, department):
-#     """
-#     Execute the publish process
-#     """
-#     path = utils.departmentPath(category, name, department)
-
-#     # path = %PROJECT_PATH%test1/asset/human/modeling
-#     # path = %PROJECT_PATH%test1/shot/shot1/modeling
-
-    
-
-#     print(path)
-
-#     # To extact the move file
-
-#     return "/temp/human.mov", True
-
-
-# def register_version(category, name, department):
-
-#     # Find the latest version input args
-
-#     # To add new entry in the database with new version
-#     pass

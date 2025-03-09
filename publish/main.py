@@ -50,7 +50,7 @@ def dcc_context(frame_start, frame_end, category, name, department, PUBLISH_DCC,
             elif typed == "usdFile":
                 return maya_scene.maya_usd_export(frame_start, frame_end, False, True, True, False, filepath=None)
             elif typed == "alembicFile":
-                return maya_scene.maya_alembic_export(frame_start, frame_end, False, True, filepath=None)
+                return maya_scene.maya_alembic_export_per_asset(frame_start, frame_end, False, True, directory=None)
             elif typed == "mp4File":
                 return maya_scene.maya_motion_export(frame_start, frame_end, "FFMPEG", "MPEG4", 24, filepath=None)
             elif typed == "movFile":
@@ -92,35 +92,44 @@ def register_version(category, name, department, typed, PUBLISH_DCC, comments):
 
 def deploy_target_filepath(source_filpath, category, name, department, typed, register_result):
     """
-    Deploy the file for distribution.
+    Deploy the file(s) for distribution.
     """
-    extension = utils.fileExtension(source_filpath)
-    project = utils.getProjectName()
-    fileName = utils.getBaseFileName(source_filpath)
+    if isinstance(source_filpath, str):
+        source_filpath = [source_filpath]
 
-    target_filepath = utils.getVersionFilepath(
-        category,
-        name,
-        department,
-        project,
-        typed,
-        register_result["version"],
-        extension,
-        fileName,
-    )
+    target_filepaths = []
 
-    broadcast.deployed(
-        source_filpath,
-        target_filepath,
-    )
+    for filepath in source_filpath:
+        extension = utils.fileExtension(filepath)
+        project = utils.getProjectName()
+        fileName = utils.getBaseFileName(filepath)
 
-    logging.info(
-        "3: Successfully deployed version called: {}, target file path: {}".format(
-            register_result["version"], target_filepath
+        target_filepath = utils.getVersionFilepath(
+            category,
+            name,
+            department,
+            project,
+            typed,
+            register_result["version"],
+            extension,
+            fileName,
         )
-    )
 
-    return target_filepath
+        broadcast.deployed(
+            filepath,
+            target_filepath,
+        )
+
+        logging.info(
+            "3: Successfully deployed version called: {}, target file path: {}".format(
+                register_result["version"], target_filepath
+            )
+        )
+
+        target_filepaths.append(target_filepath)
+
+    return target_filepaths if len(target_filepaths) > 1 else target_filepaths[0]
+
 
 def sourceFile(frame_start, frame_end, category, name, department, typed, comments):
     """

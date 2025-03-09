@@ -84,12 +84,24 @@ def getFilePath(filepath):
     directory_path = os.path.dirname(filepath)
     return directory_path
      
+     
+def getTempDirectory():
+    """
+    Generate a temporary directory path.
+    """
+    temp_dir = tempfile.mkdtemp()
+    return temp_dir
+
 
 def getTempFilepath(extension):
     """
     Generate a temporary file path with the specified extension.
     """
     temp_dir = tempfile.gettempdir()
+
+    # Ensure the temporary directory exists
+    tempfile.tempdir = temp_dir
+        
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
     temp_file.close()
     return temp_file.name
@@ -106,7 +118,7 @@ def getBaseFileName(filepath):
 def getVersionFilepath(category, name, department, project, typed, version, extension, fileName=None):
  
     department_path = departmentPath(category, name, department, project)
-    if typed != "sourceimages":
+    if typed != "sourceimages" and department != "animation":
         fileName = name
 
     filepath = os.path.join(
