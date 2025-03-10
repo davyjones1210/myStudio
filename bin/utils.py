@@ -28,10 +28,10 @@ domains_json_file = os.path.expandvars("%DATABASE_PATH%/domains.json")
 #         with open(json_file, "w") as file:
 #             json.dump([], file, indent=4)  # Empty list to store artist data
 
-# def readJson(filepath):
-#     # Reads the json filepath passed and returns the data
-#     with open(filepath, 'r') as openfile:
-#         return json.load(openfile)    
+def readJson(filepath):
+    # Reads the json filepath passed and returns the data
+    with open(filepath, 'r') as openfile:
+        return json.load(openfile)    
 
 # def writeJson(filepath, data):
 #     # Save updated domain database
