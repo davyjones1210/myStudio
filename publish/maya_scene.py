@@ -147,8 +147,21 @@ def maya_alembic_export_per_asset(frame_start, frame_end, selected=False, animat
     assets = [asset for asset in cmds.ls(assemblies=True) if asset not in ["persp", "top", "front", "side"]]
 
     for asset in assets:
-        # Select the asset
+        # Select the asset hierarchy
         cmds.select(asset, hierarchy=True, replace=True)
+
+        # Traverse the asset hierarchy and collect geometry and camera nodes
+        export_nodes = []
+        all_descendants = cmds.listRelatives(asset, allDescendents=True, fullPath=True) or []
+        for node in all_descendants:
+            if cmds.nodeType(node) in ["mesh", "nurbsSurface", "subdiv", "camera"]:
+                parent_node = cmds.listRelatives(node, parent=True, fullPath=True)[0]
+                if parent_node not in export_nodes:
+                    export_nodes.append(parent_node)
+
+        if not export_nodes:
+            print("No geometry or camera found for asset: %s", asset)
+            continue
 
         # Remove namespaces from the asset name and use the first part before the ':'
         asset_name = asset.split(":")[0]
@@ -164,12 +177,15 @@ def maya_alembic_export_per_asset(frame_start, frame_end, selected=False, animat
             "-writeVisibility",
             "-dataFormat", "ogawa",
             "-writeUVSets",
-            "-worldSpace",
-            "-root", asset
+            "-worldSpace"
         ]
 
         if animation:
             export_options.extend(["-frameRange", str(frame_start), str(frame_end)])
+
+        for node in export_nodes:
+            export_options.append("-root")
+            export_options.append(node)
 
         # Construct the export command
         export_command = ' '.join(export_options) + ' -file "{}"'.format(alembic_filepath)
@@ -360,3 +376,6 @@ def export_shader_network_metadata(filepath=None):
 
     utils.writeJson(filepath, result)
     return filepath
+
+
+# Correct approach: Traverse all the nodes and extract all the geometry from the nodes of the asset hierarchy
