@@ -147,24 +147,21 @@ def maya_alembic_export_per_asset(frame_start, frame_end, selected=False, animat
     assets = [asset for asset in cmds.ls(assemblies=True) if asset not in ["persp", "top", "front", "side"]]
 
     for asset in assets:
-        # Select the asset hierarchy
-        cmds.select(asset, hierarchy=True, replace=True)
-
-        # Traverse the asset hierarchy and collect geometry and camera nodes
-        export_nodes = []
-        all_descendants = cmds.listRelatives(asset, allDescendents=True, fullPath=True) or []
-        for node in all_descendants:
-            if cmds.nodeType(node) in ["mesh", "nurbsSurface", "subdiv", "camera"]:
-                parent_node = cmds.listRelatives(node, parent=True, fullPath=True)[0]
-                if parent_node not in export_nodes:
-                    export_nodes.append(parent_node)
-
-        if not export_nodes:
-            print("No geometry or camera found for asset: %s", asset)
-            continue
-
         # Remove namespaces from the asset name and use the first part before the ':'
         asset_name = asset.split(":")[0]
+        cache_set_name = "{}:cache_set".format(asset_name)
+
+        # Check if the cache set exists
+        if not cmds.objExists(cache_set_name):
+            print("Cache set {} does not exist for asset: {}".format(cache_set_name, asset))
+            continue
+
+        # Get the members of the cache set
+        cache_set_members = cmds.sets(cache_set_name, query=True) or []
+
+        if not cache_set_members:
+            print("No members found in cache set for asset: {}".format(asset))
+            continue
 
         # Set the file path for the Alembic export
         alembic_filepath = "{}/{}.abc".format(directory, asset_name)
@@ -172,25 +169,29 @@ def maya_alembic_export_per_asset(frame_start, frame_end, selected=False, animat
 
         # Set export options
         export_options = [
+            "-frameRange", str(frame_start), str(frame_end),
             "-uvWrite",
             "-worldSpace",
             "-writeVisibility",
             "-dataFormat", "ogawa",
-            "-writeUVSets",
-            "-worldSpace"
+            "-writeUVSets"
         ]
 
-        if animation:
-            export_options.extend(["-frameRange", str(frame_start), str(frame_end)])
+        # Add the cache set itself as a root
+        export_options.append("-root")
+        export_options.append(cache_set_name)
 
-        for node in export_nodes:
+        # Add each member of the cache set as a root
+        for member in cache_set_members:
+            full_path_member = cmds.ls(member, long=True)[0]  # Get the full path of the member
             export_options.append("-root")
-            export_options.append(node)
+            export_options.append(full_path_member)
 
         # Construct the export command
         export_command = ' '.join(export_options) + ' -file "{}"'.format(alembic_filepath)
 
         print("Export command for {}: {}".format(asset, export_command))
+
         # Execute the export command
         try:
             cmds.AbcExport(j=export_command)
@@ -199,7 +200,6 @@ def maya_alembic_export_per_asset(frame_start, frame_end, selected=False, animat
             print("Alembic export failed for {}: {}".format(asset, e))
 
     return alembic_filepaths
-
 
 def maya_motion_export(frame_start, frame_end, file_format, video_format, fps, filepath=None):
     """

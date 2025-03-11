@@ -160,10 +160,11 @@ def assembleLighting(start_frame, end_frame, category, name, department, typed, 
         # Step 4: Connect the shader to the geometry
         print("shader_metadata: ", shader_metadata)
         print("shader_metadata type: ", type(shader_metadata))
-        connect_shader_to_geometry(asset, shader_metadata)
+        
+        # connect_shader_to_geometry(asset, shader_metadata)
 
     logging.info("4. End for loop for assembling the scene with all assets")
-
+    
     # Set frame ranges
     # set_frame_ranges(start_frame, end_frame)
     return None
@@ -181,7 +182,13 @@ def import_alembic_cache(alembic_path):
     print("namespace: ", namespace)
 
     # Reference the Alembic file
-    cmds.file(alembic_path, reference=True, type="Alembic", namespace=namespace, options="v=0;")
+    nodes_referenced = cmds.file(alembic_path, reference=True, type="Alembic", namespace=namespace, returnNewNodes=True)
+
+    # file -r -type "Alembic"  -ignoreVersion -gl -mergeNamespacesOnClash false -namespace "dobby" "C:/works/projects/NewTestProj2/shot/shot-101/animation/alembicFile/v17/dobby.abc";
+
+    print("nodes_referenced: ", nodes_referenced)
+    char_group = cmds.group(empty=True, name=f"{namespace}_cache")
+    cmds.parent(nodes_referenced, char_group)
     logging.info("Successfully referenced Alembic cache from %s", alembic_path)
 
 def read_shader_metadata(metadata_path):
