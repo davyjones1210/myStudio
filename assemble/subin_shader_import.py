@@ -8,16 +8,16 @@ anim_nodes = cmds.file(sourcefile, namespace=char_name, type="Alembic", referenc
 char_group = cmds.group(empty=True, name=f"{char_name}_cache")
 cmds.parent(anim_nodes, char_group)
 
-asset_dir = cmds.referenceQuery(anim_nodes[0] ,  filename=True)
-cache_name_space = cmds.file(asset_dir, query=True, namespace=True)  
+cache_dir = cmds.referenceQuery(anim_nodes[0] ,  filename=True)
+cache_name_space = cmds.file(cache_dir, query=True, namespace=True)  
 
 # Referencer the lookdev shader
 char_name = "dobby_look"
 look_sourcefile = "C:/works/projects/NewTestProj2/asset/dobby/lookdev/shaderfile/v6/dobby.mb"
 look_nodes = cmds.file(look_sourcefile, namespace=char_name, type="mayaBinary", reference=True, returnNewNodes=True)
 
-asset_dir = cmds.referenceQuery(look_nodes[0] ,  filename=True)
-look_name_space = cmds.file(asset_dir, query=True, namespace=True)  
+look_dir = cmds.referenceQuery(look_nodes[0] ,  filename=True)
+look_name_space = cmds.file(look_dir, query=True, namespace=True)  
 
 # anim_nodes,look_nodes 
 path = "C:/works/projects/NewTestProj2/asset/dobby/lookdev/metadata/v1/dobby.json"

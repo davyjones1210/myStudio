@@ -136,7 +136,7 @@ def assembleLighting(start_frame, end_frame, category, name, department, typed, 
         alembic_path = get_asset_in_shot_version_path(name, asset, "animation", "alembicFile")
         print("alembic_path: ", alembic_path)
         if alembic_path:
-            import_alembic_cache(alembic_path)
+            anim_nodes = import_alembic_cache(alembic_path)
         else:
             logging.info("1. Could not find Alembic cache for asset: %s", asset)
             continue
@@ -145,7 +145,7 @@ def assembleLighting(start_frame, end_frame, category, name, department, typed, 
         shaderfile_path = get_asset_version_path(asset, "lookdev", "shaderfile")
         print("shaderfile_path: ", shaderfile_path)
         if shaderfile_path:
-            reference_asset_in_scene(asset, shaderfile_path)
+            look_nodes = reference_asset_in_scene(asset, shaderfile_path)
         else:
             logging.info("2. Could not find lookdev shader file for asset: %s", asset)
             continue
@@ -157,19 +157,17 @@ def assembleLighting(start_frame, end_frame, category, name, department, typed, 
         else:
             logging.info("3. Could not find shader metadata for asset: %s", asset)
             continue
-        # Step 4: Connect the shader to the geometry
-        print("shader_metadata: ", shader_metadata)
-        print("shader_metadata type: ", type(shader_metadata))
+        # Step 4: Connect the shader to the geometry using the metadata
         
-        # connect_shader_to_geometry(asset, shader_metadata)
+        connect_shader_to_geometry(anim_nodes, look_nodes, shader_metadata)
 
     logging.info("4. End for loop for assembling the scene with all assets")
     
     # Set frame ranges
-    # set_frame_ranges(start_frame, end_frame)
-    return None
+    set_frame_ranges(start_frame, end_frame)
+    # return None
     layout_scene_path = save_layout_scene(name)
-    logging.info("5. Successfully saved the layout scene to %s", layout_scene_path)
+    logging.info("5. Successfully saved the scene to %s", layout_scene_path)
 
     return layout_scene_path
 
@@ -179,17 +177,20 @@ def import_alembic_cache(alembic_path):
     """
     # Determine the namespace from the Alembic file name
     namespace = os.path.splitext(os.path.basename(alembic_path))[0]
+    namespace = "{}_anim".format(namespace)
     print("namespace: ", namespace)
 
     # Reference the Alembic file
     nodes_referenced = cmds.file(alembic_path, reference=True, type="Alembic", namespace=namespace, returnNewNodes=True)
-
+    
     # file -r -type "Alembic"  -ignoreVersion -gl -mergeNamespacesOnClash false -namespace "dobby" "C:/works/projects/NewTestProj2/shot/shot-101/animation/alembicFile/v17/dobby.abc";
 
-    print("nodes_referenced: ", nodes_referenced)
+    print("abc_nodes_referenced: ", nodes_referenced)
     char_group = cmds.group(empty=True, name=f"{namespace}_cache")
     cmds.parent(nodes_referenced, char_group)
     logging.info("Successfully referenced Alembic cache from %s", alembic_path)
+
+    return nodes_referenced
 
 def read_shader_metadata(metadata_path):
     """
@@ -198,6 +199,7 @@ def read_shader_metadata(metadata_path):
     
     shader_metadata = utils.readJsonFile(metadata_path)
     logging.info("Successfully read shader metadata from %s", metadata_path)
+
     return shader_metadata
 
 def validate_shader_metadata(shader_metadata):
@@ -216,54 +218,42 @@ def validate_shader_metadata(shader_metadata):
     return True
 
 
-def connect_shader_to_geometry(asset, shader_metadata):
+def connect_shader_to_geometry(anim_nodes, look_nodes, shader_metadata):
     """
     Connect the shader to the geometry using the metadata.
     """
+    # Referencer the anim cache
+    
+    cache_dir = cmds.referenceQuery(anim_nodes[0] ,  filename=True)
+    cache_name_space = cmds.file(cache_dir, query=True, namespace=True)  
 
-    # Validate shader metadata
-    validate_shader_metadata(shader_metadata)
+    # Referencer the lookdev shader
+    
+    look_dir = cmds.referenceQuery(look_nodes[0] ,  filename=True)
+    look_name_space = cmds.file(look_dir, query=True, namespace=True)  
 
-    # Connect shaders to geometry
-    for item in shader_metadata:
-        shader_name = item['shader']
-        shading_engine = item.get('shadingEngine')
-        meshes = item['mesh']
+    # anim_nodes,look_nodes 
+    contents = shader_metadata
+
+    for content in contents:
+        shader = "{}:{}".format(look_name_space, content["shader"])    
+        # print(shader)
         
-        if meshes:
-            if not isinstance(meshes, list):
-                meshes = [meshes]
-            
-            for mesh in meshes:
-                geo_full_name = "{}:{}".format(asset, mesh)
-                shader_full_name = "{}:{}".format(asset, shader_name)
-                shading_engine_full_name = "{}:{}".format(asset, shading_engine) if shading_engine else None
-                print("geo_full_name, shader_full_name, shading_engine_full_name: ", geo_full_name, shader_full_name, shading_engine_full_name)
-                
-                # Check if the shader exists in the scene
-                if cmds.objExists(shader_full_name):
-                    cmds.select(geo_full_name, replace=True)
-                    cmds.hyperShade(assign=shader_full_name)
-                    logging.info("Successfully assigned shader %s to geometry %s", shader_full_name, geo_full_name)
-                else:
-                    # Attempt to find the shader without the asset namespace
-                    if cmds.objExists(shader_name):
-                        cmds.select(geo_full_name, replace=True)
-                        cmds.hyperShade(assign=shader_name)
-                        logging.info("Successfully assigned shader %s to geometry %s", shader_name, geo_full_name)
-                    else:
-                        logging.warning("Shader %s does not exist in the scene", shader_full_name)
-                
-                # Connect shading engine if it exists
-                if shading_engine_full_name and cmds.objExists(shading_engine_full_name):
-                    cmds.sets(geo_full_name, edit=True, forceElement=shading_engine_full_name)
-                    logging.info("Successfully connected shading engine %s to geometry %s", shading_engine_full_name, geo_full_name)
-                elif shading_engine and cmds.objExists(shading_engine):
-                    cmds.sets(geo_full_name, edit=True, forceElement=shading_engine)
-                    logging.info("Successfully connected shading engine %s to geometry %s", shading_engine, geo_full_name)
-                else:
-                    logging.warning("Shading engine %s does not exist in the scene", shading_engine_full_name or shading_engine)
+        if cmds.objExists(shader):
 
+            shaderSG = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=f"{shader}SG")
+            # assign shader to shading group
+            cmds.connectAttr(f"{shader}.outColor", f"{shaderSG}.surfaceShader" )
+            
+            if content["mesh"]:
+                for mesh in content["mesh"]:
+                    mesh_name = "{}:{}".format(cache_name_space, mesh)
+                    # print("\tmesh - ", mesh_name)
+                    
+                    
+                    flatten_mesh = cmds.ls(mesh_name,  flatten=True)  
+        
+                    cmds.sets(flatten_mesh, e=True, forceElement=shaderSG)
 
 
 def set_frame_ranges(start_frame, end_frame):
@@ -272,7 +262,12 @@ def set_frame_ranges(start_frame, end_frame):
     """
     cmds.playbackOptions(min=start_frame, max=end_frame)
     cmds.currentTime(start_frame)
+
+    # Confirm the playback options were set correctly
+    current_min_frame = cmds.playbackOptions(query=True, min=True)
+    current_max_frame = cmds.playbackOptions(query=True, max=True)
     logging.info("Set frame range: start_frame=%d, end_frame=%d", start_frame, end_frame)
+    logging.info("Confirmed frame range: start_frame=%d, end_frame=%d", current_min_frame, current_max_frame)
 
 def get_asset_version_path(asset, department, typed):
     """
@@ -293,12 +288,15 @@ def reference_asset_in_scene(asset, version_path):
     """
     Reference the asset in the Maya scene.
     """
+    asset_namespace = "{}_look".format(asset)
     file_type = "mayaAscii" if version_path.endswith(".ma") else "mayaBinary"
-    reference_node = cmds.file(version_path, reference=True, type=file_type, ignoreVersion=True, gl=True, mergeNamespacesOnClash=False, namespace=asset, options="v=0;")
+    reference_node = cmds.file(version_path, reference=True, type=file_type, namespace=asset_namespace, returnNewNodes=True)
     logging.info("3. Successfully referenced %s in the scene", asset)
 
-    cmds.file(reference_node, loadReference=True)
-    logging.info("4. Successfully reloaded reference for %s", asset)
+    # cmds.file(reference_node, loadReference=True)
+    # logging.info("4. Successfully reloaded reference for %s", asset)
+
+    return reference_node
 
 def save_layout_scene(name):
     """
