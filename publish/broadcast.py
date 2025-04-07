@@ -23,9 +23,6 @@ ARTISTS_FIELDS = [
     "password",
 ]
 
-
-
-
 def getAllCategories():
     db = database.myDatabase()
     return db.query("category", "name")
