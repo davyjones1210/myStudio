@@ -11,14 +11,11 @@ importlib.reload(publish_utils)
 
 logging.basicConfig(level=logging.INFO)
 
-
-
 def readJsonFile(sourcefile):   
     
     with open(sourcefile, "r") as file:
         data = json.load(file)
     return data
-
 
 def writeJson(data):
 
@@ -32,7 +29,6 @@ def writeJson(data):
 
     with open(filepath, "w") as file:
         file.write(json.dumps(finalData, indent=4)) 
-
 
 def getProjectName():
     return os.environ["PROJECT_NAME"]
