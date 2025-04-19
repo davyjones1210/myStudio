@@ -22,21 +22,11 @@ projects_json_file = os.path.expandvars("%DATABASE_PATH%/projects.json")
 # Define the JSON file for domain db
 domains_json_file = os.path.expandvars("%DATABASE_PATH%/domains.json")
     
-# def initialize_json_file(json_file):
-#     # Initialize the JSON database if it doesn't exist
-#     if not os.path.exists(json_file):
-#         with open(json_file, "w") as file:
-#             json.dump([], file, indent=4)  # Empty list to store artist data
 
 def readJson(filepath):
     # Reads the json filepath passed and returns the data
     with open(filepath, 'r') as openfile:
         return json.load(openfile)    
-
-# def writeJson(filepath, data):
-#     # Save updated domain database
-#     with open(filepath, "w") as file:
-#         json.dump(data, file, indent=4)
 
 
 def collectDCC(name, dcc_data):
@@ -129,115 +119,6 @@ def checkIfArtistExists(artist_name):
             return False
                     
 
-# def name_to_database(full_name, domain="example.com", start_id=101):
-
-#     artists = readJson(artists_json_file)
-
-#     # Remove quotes and split the name into parts
-#     name_parts = full_name.replace('"', '').split()
-
-#     # Ensure at least first and last name are present
-#     if len(name_parts) < 2:
-#         raise ValueError("Invalid name format. Must have at least a first and last name.")
-
-#     # Extract first name, middle initial (if present), and last name
-#     first_name = name_parts[0].lower()
-#     middle_initial = name_parts[1].lower() if len(name_parts) == 3 else ""
-#     last_name = name_parts[-1].lower()
-
-#     # Generate the email address
-#     email = f"{first_name}{middle_initial}{last_name}@{domain}" if middle_initial else f"{first_name}{last_name}@{domain}"
-
-#     # Check if email already exists in database
-#     for artist in artists:
-#         if artist["email"] == email:
-#             print(f"Email {email} already exists with ID {artist['id']}")
-#             return artist  # Return existing artist entry
-
-#     # Assign new ID (increment from highest existing ID)
-#     if artists:
-#         max_id = max(artist["id"] for artist in artists)
-#     else:
-#         max_id = start_id - 1  # Start from 101 if empty
-
-#     new_id = max_id + 1
-
-#     # Create new artist record
-#     new_artist = {
-#         "id": new_id,
-#         "name": full_name,
-#         "email": email
-#     }
-#     artists.append(new_artist)
-
-#     writeJson(artists_json_file, artists)
-#     print(f"Added new artist: {new_artist}\n")
-#     return new_artist
-
-
-# def save_project(project_name, start_id=201):
-    
-#     projects = readJson(projects_json_file)        
-
-#     # Check if the project already exists
-#     for project in projects:
-#         if project["name"].lower() == project_name.lower():  # Case-insensitive match
-#             print(f"\nProject '{project_name}' already exists with ID {project['id']}")
-#             return project  # Return existing project entry
-
-#     # Assign new ID (increment from highest existing ID)
-#     if projects:
-#         max_id = max(project["id"] for project in projects)
-#     else:
-#         max_id = start_id - 1  # Start from 201 if empty
-
-#     new_id = max_id + 1
-
-#     # Create new project record
-#     new_project = {
-#         "id": new_id,
-#         "name": project_name
-#     }
-#     projects.append(new_project)
-#     writeJson(projects_json_file, projects)        
-
-#     print(f"\nAdded new project: {new_project}")
-#     return new_project
-
-# def createDomain(domain_name, domain_cat, start_id=301):
-#     # This function creates a new domain in the database       
-
-#     # Read existing domain database
-#     domains = readJson(domains_json_file)        
-
-#     # Check if the domain already exists
-#     for domain in domains:
-#         if domain["name"].lower() == domain_name.lower():  # Case-insensitive match
-#             print(f"\nDomain '{domain_name}' already exists with category {domain['category']}")
-#             return domain  # Return existing project entry            
-    
-#     # Assign new domain ID (increment from highest existing ID)
-#     if domains:
-#         max_id = max(domain["id"] for domain in domains)
-#     else:
-#         max_id = start_id - 1  # Start from 201 if empty
-
-#     new_id = max_id + 1
-#     logging.info(f"\nChecked domain ID: {new_id}")
-
-#     # Create new domain record
-#     new_domain = {
-#         "id": new_id,
-#         "name": domain_name,
-#         "category": domain_cat
-#     }
-#     logging.info(f"\nNew domain info: {new_domain}")
-#     domains.append(new_domain)
-
-#     writeJson(domains_json_file, domains)    
-
-#     print(f"\nAdded new domain: {new_domain}")
-#     return new_domain
 
 # From this data variable, figure out the specific block from the list, if blender collect blender data, if maya, collect maya
 # From the config find out what DCC was typed in cat --opens "here"
@@ -257,36 +138,12 @@ def runOpenCommand(options):
         print("Triggering opening function now\n")                
         triggerOpen(options.open)  
 
-def runCreateArtistCommand(options):
-    returned_artist_info = name_to_database(options.create_artist)   
-    logging.info("\nArtist info in database\nName: {}, ID: {}, Artist ID: {}".format(
-        returned_artist_info["name"], str(returned_artist_info["id"]), str(returned_artist_info["id"])
-            )
-        )
-def runcreateProjectCommand(options):
-    returned_project_info = save_project(options.create_project) 
-    logging.info("\nProject info in database\nName:: {}, Project ID: {}".format(
-        returned_project_info["name"], str(returned_project_info["id"])
-    )
-)
-def runCreateDomainCommand(options):
-    returned_domain_info = createDomain(options.create_domain, options.domain_cat)
-    logging.info("\nDomain info in database\nName:: {}, Domain ID: {}".format(
-        returned_domain_info["name"], str(returned_domain_info["id"])
-    )
-)
     # cata --create-domain "ball" --domain_cata "asset"
 
 
 def set_environments(key, value):
     os.environ[key] = value
-
-
-if __name__ == "__main__":    
-
-    initialize_json_file(artists_json_file)
-    initialize_json_file(projects_json_file)
-    initialize_json_file(domains_json_file)
+    logging.info(f"Environment variable set: {key} = {value}")
             
 # Notes:
 # os.environ["BLENDER_PLUG_IN_PATH"] = "E:/pipelineDevelopment/test1;E:/pipelineDevelopment/test2",        
